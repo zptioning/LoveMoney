@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zptioning.module_funds">
+
+    <application>
+        <provider
+            android:name="com.zptioning.module_funds.FundsProvider"
+            android:authorities="com.zption.funds.provider"
+            android:enabled="true"
+            android:exported="true" />
+    </application>
+</manifest>
