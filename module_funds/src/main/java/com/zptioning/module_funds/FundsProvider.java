@@ -86,24 +86,28 @@ import androidx.annotation.Nullable;
 public class FundsProvider extends ContentProvider {
 
 
-    String uri = "http://www.zpan.com:8080/lujing/path.htm?id=10&name=zhangsan&old=24#zuihoude";
-    Uri mUri = Uri.parse(uri);
-    // 协议
-    String scheme = mUri.getScheme(); // http
-    // 域名+端口号+路径+参数
-    String scheme_specific_part = mUri.getSchemeSpecificPart();// //www.zpan.com:8080/lujing/path.htm?id=10&name=zhangsan&old=24
-    // 域名+端口号
-    String authority = mUri.getAuthority();// www.zpan.com:8080
-    // fragment
-    String fragment = mUri.getFragment();// zuihoude
-    // 域名
-    String host = mUri.getHost();// www.zpan.com
-    // 端口号
-    int port = mUri.getPort();// 8080
-    // 路径
-    String path = mUri.getPath();// /lujing/path.htm
-    // 参数
-    String query = mUri.getQuery();// id=10&name=zhangsan&old=24
+    static {
+        String uri = "http://www.zpan.com:8080/lujing/path.htm?id=10&name=zhangsan&old=24#zuihoude";
+        Uri mUri = Uri.parse(uri);
+        // 协议
+        String scheme = mUri.getScheme(); // http
+        // 域名+端口号+路径+参数
+        String scheme_specific_part = mUri.getSchemeSpecificPart();//
+        // www.zpan.com:8080/lujing/path.htm?id=10&name=zhangsan&old=24
+
+        // 域名+端口号
+        String authority = mUri.getAuthority();// www.zpan.com:8080
+        // fragment
+        String fragment = mUri.getFragment();// zuihoude
+        // 域名
+        String host = mUri.getHost();// www.zpan.com
+        // 端口号
+        int port = mUri.getPort();// 8080
+        // 路径
+        String path = mUri.getPath();// /lujing/path.htm
+        // 参数
+        String query = mUri.getQuery();// id=10&name=zhangsan&old=24
+    }
 
 
     private static final String TAG = FundsProvider.class.getSimpleName() + "_tag";
@@ -191,17 +195,19 @@ public class FundsProvider extends ContentProvider {
             return null;
         }
 
-        // 如果要处理的是Other表 则加这个操作，如果表不存在，先创建表
-        if (TextUtils.equals(tableName, FundsDBOpenHelper.TABLE_NAME_OTHER)) {
-
-            String code = uri.getFragment();
-            if (!TextUtils.isEmpty(code)) {
-                _CreateTableIfNotExist(code);
-                tableName = code;
-            } else {
-
-            }
-        }
+//        // 如果要处理的是Other表 则加这个操作，如果表不存在，先创建表
+//        if (TextUtils.equals(tableName, FundsDBOpenHelper.TABLE_NAME_OTHER)) {
+//
+//            String code = uri.getFragment();
+//            if (!TextUtils.isEmpty(code)) {
+//                _CreateTableIfNotExist(code);
+//                tableName = code;
+//            } else {
+//                // code 为空的话 返回id 设置为 -2；
+//                Uri uri1 = ContentUris.withAppendedId(uri, -2);
+//                return uri1;
+//            }
+//        }
 
         long insert = mDb.insert(tableName, null, values);
         if (-1 != insert) {
@@ -209,7 +215,7 @@ public class FundsProvider extends ContentProvider {
         }
 
         Uri uri1 = ContentUris.withAppendedId(uri, insert);
-        Log.d(TAG, "insert ==> " + tableName + " : " + uri1.toString());
+        Log.d(TAG, "insert ==> tablename: " + tableName + " : " + uri1.toString());
         return uri1;
     }
 
@@ -319,15 +325,6 @@ public class FundsProvider extends ContentProvider {
     }
 
     /**
-     * 查询表
-     *
-     * @return
-     */
-    private Cursor getAllTables() {
-        return mDBHelper.getAllTables(mDb);
-    }
-
-    /**
      * 提供的远程调用的方法 都以下划线开头第一个字母大写
      *
      * @param method
@@ -338,22 +335,57 @@ public class FundsProvider extends ContentProvider {
     @Nullable
     @Override
     public Bundle call(@NonNull String method, @Nullable String arg, @Nullable Bundle extras) {
-        _IterateDatabase();
-        _DeleteTable(arg);
-        _IterateDatabase();
-        return super.call(method, arg, extras);
+        Bundle bundle = new Bundle();
+        String strContent = null;
+
+        switch (method) {
+            case "_queryAllTables":
+                _IterateDatabase();
+                break;
+            case "_CreateTableIfNotExist":
+                if (null != extras) {
+                    String table_name = extras.getString("table_name");
+                    _CreateTableIfNotExist(table_name);
+                }
+                break;
+            case "_DeleteTable":
+                if (null != extras) {
+                    String table_name = extras.getString("table_name");
+                    _DeleteTable(table_name);
+                }
+                break;
+            case "_ClearTable":
+                if (null != extras) {
+                    String table_name = extras.getString("table_name");
+                    _ClearTable(table_name);
+                }
+                break;
+        }
+
+
+        bundle.putString("content", strContent);
+        return bundle;
+    }
+
+    /**
+     * 查询所有表名称
+     *
+     * @return
+     */
+    private Cursor _getAllTables() {
+        return mDBHelper.getAllTables(mDb);
     }
 
     /**
      * 遍历表名
      */
-    public void _IterateDatabase() {
-        Cursor cursor = getAllTables();
+    private void _IterateDatabase() {
+        Cursor cursor = _getAllTables();
         Log.i(TAG, "_IterateDatabase ==> begin >>>>>>>>>>>");
         while (cursor.moveToNext()) {
             //遍历出表名
             String name = cursor.getString(0);
-            Log.i(TAG, "_IterateDatabase ==> " + name);
+            Log.i(TAG, "_IterateDatabase ==> name: " + name + ".db");
         }
         cursor.close();
         Log.i(TAG, "_IterateDatabase ==> end <<<<<<<<<<<<");

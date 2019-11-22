@@ -53,10 +53,12 @@ public class StocksViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (0 == type) {
+                    // 主页
                     Intent intent = new Intent("com.zption.DetailActivity");
                     intent.putExtra("code", stockEntity.code);
                     context.startActivity(intent);
-                } else {
+                } else if(1 == type){
+                    // 详情页
                     new OperationPopWindow(context).show((Activity) context,stockEntity);
                 }
             }

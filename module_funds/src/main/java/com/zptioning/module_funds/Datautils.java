@@ -54,8 +54,8 @@ public class Datautils {
     /* 查询地址 */
     private static final String codeAddress = "http://hq.sinajs.cn/list=";
 
-    public static StockEntity getRemoteData(String strExchange, String strCode) {
-        String url = codeAddress + strExchange + strCode;
+    public static StockEntity getRemoteData(String strCode) {
+        String url = codeAddress + strCode;
         String strResult = HttpUtils.getInstance().httpGetResult(url);
         return handleResult(strResult, strCode);
     }
@@ -103,10 +103,11 @@ public class Datautils {
 
 
     /**
-     * 增：插入数据
+     * 增：插入数据 到总表中
      *
      * @param contentResolver
      * @param stockEntity
+     * return null 如果股票已经存在
      */
     public static Uri insert(ContentResolver contentResolver, Uri uri, StockEntity stockEntity) {
         ContentValues values = new ContentValues();
@@ -236,11 +237,25 @@ public class Datautils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public static String addFragment(String uri, String fragment) {
         return new String(uri + "#" + fragment);
+    }
+
+    /**
+     * 查询所有的表
+     *
+     * @param contentResolver
+     */
+    public static void queryAllTables(ContentResolver contentResolver) {
+        try {
+            Bundle bundle = new Bundle();
+            Uri uri = Uri.parse("content://" + FundsProvider.AUTHORITY);
+            Bundle callBundle = contentResolver.call(uri, "_queryAllTables", null, bundle);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

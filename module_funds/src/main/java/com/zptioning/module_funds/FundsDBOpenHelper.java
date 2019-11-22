@@ -58,7 +58,6 @@ public class FundsDBOpenHelper extends SQLiteOpenHelper {
     }
 
 
-
     /*************************************************************************/
     /*********** 一下方法自定义添加提供给外部使用 ************/
     /*************************************************************************/
@@ -106,16 +105,6 @@ public class FundsDBOpenHelper extends SQLiteOpenHelper {
         Log.d(TAG, "onCreate ==> " + createStatement);
     }
 
-//    /**
-//     * 创建表
-//     *
-//     * @param db
-//     * @param tableName
-//     */
-//    public void createTable(SQLiteDatabase db, String tableName) {
-//        createTableIfNotExist(db, tableName);
-//    }
-
     /**
      * 删除表
      *
@@ -127,7 +116,8 @@ public class FundsDBOpenHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 清楚表
+     * 清除表
+     *
      * @param db
      * @param tableName
      */

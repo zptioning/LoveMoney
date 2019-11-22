@@ -1,30 +1,26 @@
 package com.zptioning.lovemoney;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zptioning.module_funds.Datautils;
-import com.zptioning.module_funds.FundsProvider;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface.ENUM_TITLES;
 import com.zptioning.module_widgets.adapter.StocksAdapter;
 import com.zptioning.module_widgets.custom_view.CustomItemDecoration;
 
 import java.util.EnumSet;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,8 +36,12 @@ import androidx.recyclerview.widget.RecyclerView;
  * @Version 1.0
  * @Description
  */
-public class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
+    // 主页标记
+    protected static final int TYPE_MAIN_FRAGEMNT = 0;
+    // 详情页标记
+    protected static final int TYPE_DETAIL_FRAGEMNT = 1;
 
     protected Activity _mActivity;
     // 根布局
@@ -56,13 +56,13 @@ public class BaseFragment extends Fragment {
     /**
      * 0:mainfragment  1:detailfragment
      */
-    protected int mType = 0;
+    protected int mType = TYPE_MAIN_FRAGEMNT;
 
     private RecyclerView mRvStocks;
-    private String strExchange = "";
+    protected String strExchange = "";
 
 
-    private StocksAdapter mStocksAdapter;
+    protected StocksAdapter mStocksAdapter;
 
 
     private String[] titles = {
@@ -105,36 +105,41 @@ public class BaseFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         // 将layout布局转换成View
         _mActivity = getActivity();
-        mRootView = inflater.inflate(R.layout.fragment_main, null);
+        mRootView = inflater.inflate(getLayoutID(), null);
         mLLTop = mRootView.findViewById(R.id.ll_top);
         return mRootView;
     }
 
+    protected abstract int getLayoutID();
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (0 == mType) {
-            initTopWidgets();
-        } else {
-            mLLTop.setVisibility(View.GONE);
-        }
+        // 查询当前有哪些表
+        Datautils.queryAllTables(_mActivity.getContentResolver());
+        initTopWidgets();
         initRvStocks();
         initEnums();
         updateAllData();
     }
 
     /**
-     * 更新页面所有数据
+     * 初始化控件
      */
-    private void updateAllData() {
-        if (0 == mType) {
-            List<StockEntity> stockEntities = Datautils.queryAllStocks(_mActivity.getContentResolver(),
-                    FundsProvider.STOCK_CONTENT_URI);
-            mStocksAdapter.replaceData(stockEntities);
-        } else {
+    protected abstract void initTopWidgets();
 
-        }
+    /**
+     * 初始化列表
+     */
+    private void initRvStocks() {
+        mRvStocks = mRootView.findViewById(R.id.rv_stocks);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(_mActivity);
+        linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        mRvStocks.setLayoutManager(linearLayoutManager);
+        mRvStocks.addItemDecoration(new CustomItemDecoration());
+
+        mStocksAdapter = new StocksAdapter(mType, null);
+        mRvStocks.setAdapter(mStocksAdapter);
     }
 
     private void initEnums() {
@@ -153,6 +158,11 @@ public class BaseFragment extends Fragment {
     }
 
     /**
+     * 更新页面所有数据
+     */
+    protected abstract void updateAllData();
+
+    /**
      * @param viewById
      * @param enum_title
      * @param ordinal
@@ -165,146 +175,27 @@ public class BaseFragment extends Fragment {
         viewById.setVisibility(View.VISIBLE);
         viewById.setText(String.format("%02d", ordinal) + ":" + titles[ordinal]);
 
-        if (0 == mType) {
-            switch (enum_title.name()) {
-                // 执行买卖操作
-                case "INDEX":
-                    break;
-                case "TIME":
-                    viewById.setVisibility(View.GONE);
-                    break;
-                case "CODE":
-                    break;
-                case "NAME":
-                    break;
-                case "COST":
-                    break;
-                case "PRICE":
-                    break;
-                case "RATE":
-                    break;
-                case "COUNT":
-                    break;
-                case "OPTION":
-                    break;
-                case "SOLD":
-                    break;
-                case "HOLD":
-                    break;
-                case "STATUS":
-                    viewById.setVisibility(View.GONE);
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            switch (enum_title.name()) {
-                // 执行买卖操作
-                case "INDEX":
-                    break;
-                case "TIME":
-                    break;
-                case "CODE":
-                    break;
-                case "NAME":
-                    break;
-                case "COST":
-                    break;
-                case "PRICE":
-                    break;
-                case "RATE":
-                    break;
-                case "COUNT":
-                    break;
-                case "OPTION":
-                    break;
-                case "SOLD":
-                    viewById.setVisibility(View.GONE);
-                    break;
-                case "HOLD":
-                    viewById.setVisibility(View.GONE);
-                    break;
-                case "STATUS":
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-
-    /**
-     * 初始化列表
-     */
-    private void initRvStocks() {
-        mRvStocks = mRootView.findViewById(R.id.rv_stocks);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(_mActivity);
-        linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        mRvStocks.setLayoutManager(linearLayoutManager);
-        mRvStocks.addItemDecoration(new CustomItemDecoration());
-
-        mStocksAdapter = new StocksAdapter(mType, null);
-        mRvStocks.setAdapter(mStocksAdapter);
+        updateLines(viewById, enum_title);
     }
 
     /**
-     * 初始化控件
+     * 更新列
+     *
+     * @param viewById
+     * @param enum_title
      */
-    private void initTopWidgets() {
-        /** 单选框初始化 和 监听 */
-        RadioGroup radioGroup = mRootView.findViewById(R.id.rg_parent);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.rb_sh:
-                        strExchange = "sh";
-                        break;
-                    case R.id.rb_sz:
-                        strExchange = "sz";
-                        break;
-                    default:
-                        strExchange = "";
-                        break;
-                }
-            }
-        });
-        radioGroup.check(R.id.rb_sh);
-        strExchange = "sh";
+    protected abstract void updateLines(TextView viewById, ENUM_TITLES enum_title);
 
-        /** 输入框初始化和监听 */
-        mEtCode = mRootView.findViewById(R.id.et_code);
-        mEtCode.setText("510300");
-
-        /** 插入按钮初始化监听 */
-        Button btnInsert = mRootView.findViewById(R.id.btn_insert);
-        btnInsert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (TextUtils.isEmpty(strExchange)) {
-                    Toast.makeText(_mActivity, "请先选交易所！！", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String strCode = mEtCode.getText().toString();
-                if (TextUtils.isEmpty(strCode)) {
-                    Toast.makeText(_mActivity, "请输入股票代码！！", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                StockEntity stockEntity = Datautils.getRemoteData(strExchange, strCode);
-                insertStock(stockEntity);
-            }
-        });
-    }
+    protected abstract void queryResult(ContentResolver contentResolver, Uri stockContentUri);
 
     /**
      * 插入指定股票信息
      *
      * @param stockEntity
+     * @param stockContentUri
      */
-    private void insertStock(StockEntity stockEntity) {
-        Uri uri = Datautils.insert(_mActivity.getContentResolver(), FundsProvider.STOCK_CONTENT_URI,
-                stockEntity);
+    protected void insertStock(StockEntity stockEntity, Uri stockContentUri) {
+        Uri uri = Datautils.insert(_mActivity.getContentResolver(), stockContentUri, stockEntity);
         if (null == uri) {
             Toast.makeText(_mActivity, "股票已存在！！", Toast.LENGTH_SHORT).show();
             return;
@@ -313,6 +204,8 @@ public class BaseFragment extends Fragment {
         if (-1 == id) {
             Toast.makeText(_mActivity, "插入失败", Toast.LENGTH_SHORT).show();
         } else {
+            // 查询当前数据库 有 哪些表
+            queryResult(_mActivity.getContentResolver(), stockContentUri);
             updateAllData();
         }
     }

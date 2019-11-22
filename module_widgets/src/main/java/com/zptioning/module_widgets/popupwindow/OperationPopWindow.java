@@ -2,9 +2,12 @@ package com.zptioning.module_widgets.popupwindow;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
 import com.zptioning.module_funds.StockEntity;
@@ -26,15 +29,21 @@ public class OperationPopWindow extends PopupWindow {
         super(context);
         mContext = context;
         View view = LayoutInflater.from(context).inflate(R.layout.pop_window_operation, null);
+        setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         setContentView(view);
+        setTouchable(true);
+        setFocusable(true);
+        setOutsideTouchable(true);
+        setBackgroundDrawable(new BitmapDrawable());
     }
 
     /**
      * 显示
      */
     public void show(Activity activity) {
-        if (!activity.isFinishing() && isShowing()) {
-            showAtLocation(activity.getWindow().getDecorView(), Gravity.BOTTOM, 0, 0);
+        if (!activity.isFinishing() && !isShowing()) {
+            showAtLocation(activity.getWindow().getDecorView(), Gravity.CENTER, 0, 0);
         }
     }
 
