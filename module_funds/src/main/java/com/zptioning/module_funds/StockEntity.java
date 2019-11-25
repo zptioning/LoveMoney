@@ -31,10 +31,10 @@ import java.math.BigDecimal;
 public class StockEntity {
     public int _id;// 主键
     public int index;// "索引",
-    public String time;// "时间",
+    public long time;// "时间",
     public String code;// 代码
     public String name;// 名称
-    public BigDecimal cost;// 成本价
+    public BigDecimal cost;// 成本价 在主页面表示成本价  在详情页 表示买入或者卖出的价格
     public BigDecimal price;// 市场价
     public BigDecimal rate;// 涨幅
     public int count;// 数量
@@ -42,4 +42,23 @@ public class StockEntity {
     public int status;// 状态   1:持有  2:非持有
     public int hold;// 持有 数量
     public int sold;// 已经卖出  数量
+
+    @Override
+    public String toString() {
+        return "StockEntity{" +
+                "_id=" + _id +
+                ", index=" + index +
+                ", time=" + time +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", cost=" + cost +
+                ", price=" + price +
+                ", rate=" + rate +
+                ", count=" + count +
+                ", operation=" + operation +
+                ", status=" + status +
+                ", hold=" + hold +
+                ", sold=" + sold +
+                '}';
+    }
 }

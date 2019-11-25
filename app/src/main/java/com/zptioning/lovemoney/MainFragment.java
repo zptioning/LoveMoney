@@ -16,6 +16,7 @@ import com.zptioning.module_funds.Datautils;
 import com.zptioning.module_funds.FundsProvider;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
+import com.zptioning.module_widgets.adapter.StocksAdapter;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -78,23 +79,29 @@ public class MainFragment extends BaseFragment {
 
         /** 插入按钮初始化监听 */
         Button btnInsert = mRootView.findViewById(R.id.btn_insert);
-        btnInsert.setOnClickListener(new View.OnClickListener() {
+        btnInsert.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 if (TextUtils.isEmpty(strExchange)) {
                     Toast.makeText(_mActivity, "请先选交易所！！", Toast.LENGTH_SHORT).show();
-                    return;
+                    return false;
                 }
                 String strCode = mEtCode.getText().toString();
                 if (TextUtils.isEmpty(strCode)) {
                     Toast.makeText(_mActivity, "请输入股票代码！！", Toast.LENGTH_SHORT).show();
-                    return;
+                    return false;
                 }
 
                 StockEntity stockEntity = Datautils.getRemoteData(strExchange + strCode);
                 insertStock(stockEntity, FundsProvider.STOCK_CONTENT_URI);
+                return true;
             }
         });
+    }
+
+    @Override
+    protected void initAdapter() {
+        mStocksAdapter = new StocksAdapter(mType, null);
     }
 
     /**
@@ -120,10 +127,10 @@ public class MainFragment extends BaseFragment {
     private void calculateWithLocalData(List<StockEntity> stockEntities) {
         for (int i = 0; i < stockEntities.size(); i++) {
             StockEntity stockEntity = stockEntities.get(i);
-            List<StockEntity> detailList = Datautils.queryAllStocks(_mActivity.getContentResolver(),
-                    Datautils.addFragment(FundsProvider.OTHER_CONTENT_URI, stockEntity.code));
-            if (null == detailList) {
-                return;
+            List<StockEntity> detailList = Datautils.queryAllStocks(mContentResolver,
+                    Datautils.addOtherFragment(stockEntity.code));
+            if (null == detailList || detailList.size() == 0) {
+                continue;
             }
             // 计算 成本 总数量 持有数量 已卖数量 涨幅
             BigDecimal cost = new BigDecimal("0");// 成本
@@ -203,6 +210,6 @@ public class MainFragment extends BaseFragment {
 
     @Override
     protected void queryResult(ContentResolver contentResolver, Uri stockContentUri) {
-        Datautils.queryAllTables(contentResolver);
+        Datautils._QueryAllTables(contentResolver);
     }
 }

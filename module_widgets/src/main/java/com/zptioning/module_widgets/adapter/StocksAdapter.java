@@ -6,9 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zptioning.module_funds.Datautils;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface.ENUM_TITLES;
 import com.zptioning.module_widgets.R;
+import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
 import com.zptioning.module_widgets.viewholder.StocksViewHolder;
 
 import java.util.ArrayList;
@@ -32,9 +34,21 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
     private List<StockEntity> mDataList;
     private Context mContext;
 
+    private OperationPopWindow.OnBuyListener mOnBuyListener;
+    private OperationPopWindow.OnSellListener mOnSellListener;
+
     public StocksAdapter(int type, List<StockEntity> dataList) {
         mType = type;
         mDataList = dataList;
+    }
+
+    public StocksAdapter(int type, List<StockEntity> dataList,
+                         OperationPopWindow.OnBuyListener onBuyListener,
+                         OperationPopWindow.OnSellListener onSellListener) {
+        mType = type;
+        mDataList = dataList;
+        mOnBuyListener = onBuyListener;
+        mOnSellListener = onSellListener;
     }
 
     @NonNull
@@ -42,7 +56,11 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
     public StocksViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_view_stock, parent, false);
-        return new StocksViewHolder(view);
+        if (mType == 0) {
+            return new StocksViewHolder(view);
+        } else {
+            return new StocksViewHolder(view, mOnBuyListener, mOnSellListener);
+        }
     }
 
     @Override
@@ -66,7 +84,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
                         break;
                     case "TIME":
                         holder.mTextViews[ordinal].setVisibility(View.GONE);
-                        holder.setText(holder.mTextViews[ordinal], stockEntity.time);
+                        holder.setText(holder.mTextViews[ordinal], Datautils.dateFormat(stockEntity.time));
                         break;
                     case "CODE":
                         holder.setText(holder.mTextViews[ordinal], stockEntity.code);
@@ -111,7 +129,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
                         holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.index));
                         break;
                     case "TIME":
-                        holder.setText(holder.mTextViews[ordinal], stockEntity.time);
+                        holder.setText(holder.mTextViews[ordinal], Datautils.dateFormat(stockEntity.time));
                         break;
                     case "CODE":
                         holder.setText(holder.mTextViews[ordinal], stockEntity.code);

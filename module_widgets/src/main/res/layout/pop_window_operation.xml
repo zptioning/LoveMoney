@@ -60,7 +60,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:hint="价格"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:paddingLeft="20dp"
             android:paddingRight="10dp"
             android:textColor="#CD2626"
@@ -112,7 +112,7 @@
             android:text="买入" />
 
         <Button
-            android:id="@+id/btn_sold"
+            android:id="@+id/btn_sell"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"

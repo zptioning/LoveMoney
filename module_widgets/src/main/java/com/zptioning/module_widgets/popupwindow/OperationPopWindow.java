@@ -13,6 +13,8 @@ import android.widget.PopupWindow;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_widgets.R;
 
+import java.math.BigDecimal;
+
 /**
  * @ClassName OperationPopWindow
  * @Author zptioning
@@ -24,8 +26,12 @@ public class OperationPopWindow extends PopupWindow {
 
     private Context mContext;
     private StockEntity mStockEntity;
-    private boolean mBNewBuy;
+    private boolean mBNewBuy;// 是否是新买的一组股票
     private final View mView;
+    private OnBuyListener mOnBuyListener;
+    private OnSellListener mOnSellListener;
+    private EditText mEtCount;
+    private EditText mEtPrice;
 
     public OperationPopWindow(Context context, StockEntity stockEntity) {
         super(context);
@@ -44,17 +50,43 @@ public class OperationPopWindow extends PopupWindow {
 
     private void initListeners() {
         ((EditText) mView.findViewById(R.id.et_code1)).setText(mStockEntity.code);
+        mEtCount = mView.findViewById(R.id.et_count);
+        mEtPrice = mView.findViewById(R.id.et_price);
+
+        /* 买入股票 */
         mView.findViewById(R.id.btn_buy).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (null != mOnBuyListener) {
+                    mStockEntity.time = System.currentTimeMillis();
+                    mStockEntity.status = 1;
+                    if (0 == mStockEntity.count) {// 新买入的
+                        mStockEntity.cost = new BigDecimal(mEtPrice.getText().toString());
+                        try {
+                            mStockEntity.count = Integer.parseInt(mEtCount.getText().toString());
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // 非新买入的
 
+                    }
+                    mOnBuyListener.onBuy(mStockEntity);
+                }
             }
         });
 
-        mView.findViewById(R.id.btn_buy).setOnClickListener(new View.OnClickListener() {
+        /* 卖出股票 */
+        mView.findViewById(R.id.btn_sell).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (null != mOnSellListener) {
+                    // 卖出 记录卖出的价格
+                    mStockEntity.time = System.currentTimeMillis();
+                    mStockEntity.cost = new BigDecimal(mEtPrice.getText().toString());
+                    mStockEntity.status = 2;
+                    mOnSellListener.onSell(mStockEntity);
+                }
             }
         });
     }
@@ -71,8 +103,31 @@ public class OperationPopWindow extends PopupWindow {
     public OperationPopWindow setNewBuy(boolean bNewBuy) {
         mBNewBuy = bNewBuy;
         if (mBNewBuy) {
-            mView.findViewById(R.id.btn_sold).setVisibility(View.GONE);
+            mView.findViewById(R.id.btn_sell).setVisibility(View.GONE);
+        } else {
+            mEtCount.setText(mStockEntity.count);
+            mEtCount.setEnabled(false);
+            mEtPrice.setText(mStockEntity.price.toString());
+            mEtPrice.setEnabled(false);
         }
         return this;
+    }
+
+    public OperationPopWindow setOnBuyListener(OnBuyListener onBuyListener) {
+        mOnBuyListener = onBuyListener;
+        return this;
+    }
+
+    public OperationPopWindow setOnSellListener(OnSellListener onSellListener) {
+        mOnSellListener = onSellListener;
+        return this;
+    }
+
+    public interface OnBuyListener {
+        void onBuy(StockEntity stockEntity);
+    }
+
+    public interface OnSellListener {
+        void onSell(StockEntity stockEntity);
     }
 }

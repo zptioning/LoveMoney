@@ -94,6 +94,7 @@ public abstract class BaseFragment extends Fragment {
             R.id.tv_10,
             R.id.tv_11,
     };
+    protected ContentResolver mContentResolver;
 
     /* 数据处理工具 */
 //    private Datautils mDatautils;
@@ -116,7 +117,8 @@ public abstract class BaseFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // 查询当前有哪些表
-        Datautils.queryAllTables(_mActivity.getContentResolver());
+        mContentResolver = _mActivity.getContentResolver();
+        Datautils._QueryAllTables(mContentResolver);
         initTopWidgets();
         initRvStocks();
         initEnums();
@@ -137,8 +139,13 @@ public abstract class BaseFragment extends Fragment {
         linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mRvStocks.setLayoutManager(linearLayoutManager);
         mRvStocks.addItemDecoration(new CustomItemDecoration());
+        initAdapter();
 
-        mStocksAdapter = new StocksAdapter(mType, null);
+//        if(mType == 0) {
+//            mStocksAdapter = new StocksAdapter(mType, null);
+//        }else {
+//            mStocksAdapter = new StocksAdapter(mType,null);
+//        }
         mRvStocks.setAdapter(mStocksAdapter);
     }
 
@@ -156,6 +163,8 @@ public abstract class BaseFragment extends Fragment {
             }
         }
     }
+
+    protected abstract void initAdapter();
 
     /**
      * 更新页面所有数据
@@ -195,7 +204,7 @@ public abstract class BaseFragment extends Fragment {
      * @param stockContentUri
      */
     protected void insertStock(StockEntity stockEntity, Uri stockContentUri) {
-        Uri uri = Datautils.insert(_mActivity.getContentResolver(), stockContentUri, stockEntity);
+        Uri uri = Datautils.insert(mContentResolver, stockContentUri, stockEntity);
         if (null == uri) {
             Toast.makeText(_mActivity, "股票已存在！！", Toast.LENGTH_SHORT).show();
             return;
@@ -205,7 +214,7 @@ public abstract class BaseFragment extends Fragment {
             Toast.makeText(_mActivity, "插入失败", Toast.LENGTH_SHORT).show();
         } else {
             // 查询当前数据库 有 哪些表
-            queryResult(_mActivity.getContentResolver(), stockContentUri);
+            queryResult(mContentResolver, stockContentUri);
             updateAllData();
         }
     }

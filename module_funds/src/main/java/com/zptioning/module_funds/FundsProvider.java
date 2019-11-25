@@ -196,19 +196,9 @@ public class FundsProvider extends ContentProvider {
             return null;
         }
 
-//        // 如果要处理的是Other表 则加这个操作，如果表不存在，先创建表
-//        if (TextUtils.equals(tableName, FundsDBOpenHelper.TABLE_NAME_OTHER)) {
-//
-//            String code = uri.getFragment();
-//            if (!TextUtils.isEmpty(code)) {
-//                _CreateTableIfNotExist(code);
-//                tableName = code;
-//            } else {
-//                // code 为空的话 返回id 设置为 -2；
-//                Uri uri1 = ContentUris.withAppendedId(uri, -2);
-//                return uri1;
-//            }
-//        }
+        if (TextUtils.equals(FundsDBOpenHelper.TABLE_NAME_OTHER, tableName)) {
+            tableName = uri.getFragment();
+        }
 
         long insert = mDb.insert(tableName, null, values);
         if (-1 != insert) {
@@ -231,7 +221,11 @@ public class FundsProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection,
                       @Nullable String[] selectionArgs) {
+
         String tableName = getTableName(uri);
+        if (TextUtils.equals(FundsDBOpenHelper.TABLE_NAME_OTHER, tableName)) {
+            tableName = uri.getFragment();
+        }
 
         int delete = mDb.delete(tableName, selection, selectionArgs);
         if (delete > 0) {
@@ -255,7 +249,11 @@ public class FundsProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection,
                       @Nullable String[] selectionArgs) {
+
         String tableName = getTableName(uri);
+        if (TextUtils.equals(FundsDBOpenHelper.TABLE_NAME_OTHER, tableName)) {
+            tableName = uri.getFragment();
+        }
 
         int update = mDb.update(tableName, values, selection, selectionArgs);
         if (update > 0) {
@@ -350,8 +348,8 @@ public class FundsProvider extends ContentProvider {
         String strContent = null;
 
         switch (method) {
-            case "_queryAllTables":
-                _IterateDatabase();
+            case "_QueryAllTables":
+                strContent = _IterateDatabase();
                 break;
             case "_CreateTableIfNotExist":
                 if (null != extras) {
@@ -390,16 +388,19 @@ public class FundsProvider extends ContentProvider {
     /**
      * 遍历表名
      */
-    private void _IterateDatabase() {
+    private String _IterateDatabase() {
         Cursor cursor = _getAllTables();
-        Log.i(TAG, "_IterateDatabase ==> begin >>>>>>>>>>>");
+        Log.e(TAG, "_IterateDatabase ==> begin >>>>>>>>>>>");
+        StringBuilder stringBuilder = new StringBuilder("#");
         while (cursor.moveToNext()) {
             //遍历出表名
             String name = cursor.getString(0);
+            stringBuilder.append(name).append("#");
             Log.i(TAG, "_IterateDatabase ==> name: " + name + ".db");
         }
         cursor.close();
-        Log.i(TAG, "_IterateDatabase ==> end <<<<<<<<<<<<");
+        Log.e(TAG, "_IterateDatabase ==> end <<<<<<<<<<<<");
+        return stringBuilder.toString();
     }
 
     /**

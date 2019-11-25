@@ -11,7 +11,9 @@ import android.util.Log;
 import com.zptioning.module_funds.net_work.HttpUtils;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -86,7 +88,7 @@ public class Datautils {
 
         StockEntity stockEntity = new StockEntity();
         stockEntity.index = 0;
-        stockEntity.time = split[30];
+        stockEntity.time = System.currentTimeMillis();
         stockEntity.code = strCode;
         stockEntity.name = split[0];
         stockEntity.cost = new BigDecimal("0");
@@ -110,21 +112,25 @@ public class Datautils {
      */
     public static Uri insert(ContentResolver contentResolver, Uri uri, StockEntity stockEntity) {
         ContentValues values = new ContentValues();
-        List<StockEntity> stockEntities = queryAllStocks(contentResolver, uri);
-
-        for (StockEntity entity : stockEntities) {
-            if (TextUtils.equals(stockEntity.code, entity.code)) {
-                return null;
-            }
+        String strTables = _QueryAllTables(contentResolver);
+        if (TextUtils.isEmpty(strTables) || !strTables.contains("#" + stockEntity.code)) {
+            // TODO: 2019-11-25 创建 code 表
+            _CreateTableIfNotExist(contentResolver, stockEntity.code);
         }
 
-        values.put(COL_INDEX, null == stockEntities ? 0 : stockEntities.size() + 1);
+        values.put(COL_INDEX, stockEntity.index);
         values.put(COL_TIME, stockEntity.time);
         values.put(COL_CODE, stockEntity.code);
         values.put(COL_NAME, stockEntity.name);
-        values.put(COL_COST, stockEntity.cost.toString());
-        values.put(COL_PRICE, stockEntity.price.toString());
-        values.put(COL_RATE, stockEntity.rate.toString());
+        if (null != stockEntity.cost) {
+            values.put(COL_COST, stockEntity.cost.toString());
+        }
+        if (null != stockEntity.price) {
+            values.put(COL_PRICE, stockEntity.price.toString());
+        }
+        if (null != stockEntity.rate) {
+            values.put(COL_RATE, stockEntity.rate.toString());
+        }
         values.put(COL_COUNT, stockEntity.count);
         values.put(COL_OPERATION, stockEntity.operation);
         values.put(COL_STATUS, stockEntity.status);
@@ -171,7 +177,7 @@ public class Datautils {
     }
 
     /**
-     * 查：查询数据
+     * 查：某个表中的所有数据 查询数据
      *
      * @param contentResolver
      * @return
@@ -189,7 +195,7 @@ public class Datautils {
         while (cursor.moveToNext()) {
             int id = cursor.getInt(cursor.getColumnIndex(COL_ID));
             int index = cursor.getInt(cursor.getColumnIndex(COL_INDEX));
-            String time = cursor.getString(cursor.getColumnIndex(COL_TIME));
+            long time = cursor.getLong(cursor.getColumnIndex(COL_TIME));
             String code = cursor.getString(cursor.getColumnIndex(COL_CODE));
             String name = cursor.getString(cursor.getColumnIndex(COL_NAME));
             String cost = cursor.getString(cursor.getColumnIndex(COL_COST));
@@ -250,18 +256,54 @@ public class Datautils {
     }
 
     /**
+     * other 类型uri 添加fragment
+     *
+     * @param fragment
+     * @return
+     */
+    public static Uri addOtherFragment(String fragment) {
+        return addFragment(FundsProvider.OTHER_CONTENT_URI, fragment);
+    }
+
+
+    public static void _CreateTableIfNotExist(ContentResolver contentResolver, String tableName) {
+        Bundle bundle = new Bundle();
+        bundle.putString("table_name", tableName);
+        Uri uri = Uri.parse("content://" + FundsProvider.AUTHORITY);
+        Bundle callBundle = contentResolver.call(uri, "_CreateTableIfNotExist", tableName, bundle);
+    }
+
+    /**
      * 查询所有的表
      *
      * @param contentResolver
      */
-    public static void queryAllTables(ContentResolver contentResolver) {
+    public static String _QueryAllTables(ContentResolver contentResolver) {
         try {
             Bundle bundle = new Bundle();
             Uri uri = Uri.parse("content://" + FundsProvider.AUTHORITY);
-            Bundle callBundle = contentResolver.call(uri, "_queryAllTables", null, bundle);
+            Bundle callBundle = contentResolver.call(uri, "_QueryAllTables", null, bundle);
+            if (null != callBundle) {
+                return callBundle.getString("content");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
+
+    /**
+     * 格式化date
+     *
+     * @param date
+     * @return
+     */
+    public static String dateFormat(long date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd\nHH:mm:ss");
+        Date date1 = new Date(date);
+        String format = simpleDateFormat.format(date1);
+        return format;
+    }
+
 
 }

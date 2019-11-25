@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class StocksViewHolder extends RecyclerView.ViewHolder {
 
+    private OperationPopWindow.OnBuyListener mOnBuyListener;
+    private OperationPopWindow.OnSellListener mOnSellListener;
+
     public int[] resIDs = {
             R.id.tv_0,
             R.id.tv_1,
@@ -39,6 +42,16 @@ public class StocksViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    public StocksViewHolder(@NonNull View itemView, OperationPopWindow.OnBuyListener onBuyListener,
+                            OperationPopWindow.OnSellListener onSellListener) {
+        super(itemView);
+        mOnBuyListener = onBuyListener;
+        mOnSellListener = onSellListener;
+        for (int i = 0; i < resIDs.length; i++) {
+            mTextViews[i] = itemView.findViewById(resIDs[i]);
+        }
+    }
+
 
     public void setText(TextView textView, String content) {
         if (null == textView) {
@@ -48,6 +61,14 @@ public class StocksViewHolder extends RecyclerView.ViewHolder {
         textView.setText("0".equals(content) ? "-" : content);
     }
 
+    /**
+     * 点击操作时的监听响应
+     *
+     * @param context
+     * @param textView
+     * @param stockEntity
+     * @param type
+     */
     public void setOnClickOptionListener(final Context context, TextView textView, final StockEntity stockEntity, final int type) {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,9 +78,26 @@ public class StocksViewHolder extends RecyclerView.ViewHolder {
                     Intent intent = new Intent("com.zption.DetailActivity");
                     intent.putExtra("code", stockEntity.code);
                     context.startActivity(intent);
-                } else if(1 == type){
+                } else if (1 == type) {
                     // 详情页
-                    new OperationPopWindow(context,stockEntity).show((Activity) context);
+                    new OperationPopWindow(context, stockEntity)
+                            .setOnBuyListener(new OperationPopWindow.OnBuyListener() {
+                                @Override
+                                public void onBuy(StockEntity stockEntity) {
+                                    if (null != mOnBuyListener) {
+                                        mOnBuyListener.onBuy(stockEntity);
+                                    }
+                                }
+                            })
+                            .setOnSellListener(new OperationPopWindow.OnSellListener() {
+                                @Override
+                                public void onSell(StockEntity stockEntity) {
+                                    if (null != mOnSellListener) {
+                                        mOnSellListener.onSell(stockEntity);
+                                    }
+                                }
+                            })
+                            .show((Activity) context);
                 }
             }
         });
