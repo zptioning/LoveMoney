@@ -8,14 +8,14 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         mCode = getIntent().getStringExtra("code");
+        super.onCreate(savedInstanceState);
         setTitle(mCode);
     }
 
     @Override
     protected BaseFragment getFragment() {
-        return DetailFragment.getInstance();
+        return DetailFragment.getInstance(mCode);
     }
 
     @Override

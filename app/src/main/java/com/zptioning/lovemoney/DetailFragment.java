@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.zptioning.module_funds.StockEntity;
@@ -25,7 +26,10 @@ import androidx.annotation.Nullable;
  */
 public class DetailFragment extends BaseFragment {
 
-    public static DetailFragment getInstance() {
+    private static String sCode;
+
+    public static DetailFragment getInstance(String code) {
+        sCode = code;
         return new DetailFragment();
     }
 
@@ -43,7 +47,18 @@ public class DetailFragment extends BaseFragment {
 
     @Override
     protected void initTopWidgets() {
-        mLLTop.setVisibility(View.GONE);
+        mRootView.findViewById(R.id.rg_parent).setVisibility(View.GONE);
+        mRootView.findViewById(R.id.et_code).setVisibility(View.GONE);
+        Button btnInsert = mRootView.findViewById(R.id.btn_insert);
+        btnInsert.setText("新买一组");
+        btnInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StockEntity stockEntity = new StockEntity();
+                stockEntity.code = sCode;
+                new OperationPopWindow(_mActivity,stockEntity).setNewBuy(true).show(_mActivity);
+            }
+        });
     }
 
     @Override
@@ -72,13 +87,6 @@ public class DetailFragment extends BaseFragment {
             case "COUNT":
                 break;
             case "OPTION":
-                viewById.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // 详情页
-                        new OperationPopWindow(_mActivity).show(_mActivity,new StockEntity());
-                    }
-                });
                 break;
             case "SOLD":
                 viewById.setVisibility(View.GONE);

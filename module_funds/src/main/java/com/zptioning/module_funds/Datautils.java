@@ -106,8 +106,7 @@ public class Datautils {
      * 增：插入数据 到总表中
      *
      * @param contentResolver
-     * @param stockEntity
-     * return null 如果股票已经存在
+     * @param stockEntity     return null 如果股票已经存在
      */
     public static Uri insert(ContentResolver contentResolver, Uri uri, StockEntity stockEntity) {
         ContentValues values = new ContentValues();
@@ -239,8 +238,15 @@ public class Datautils {
         }
     }
 
-    public static String addFragment(String uri, String fragment) {
-        return new String(uri + "#" + fragment);
+    /**
+     * 给uri 添加 fragment
+     *
+     * @param uri
+     * @param fragment
+     * @return
+     */
+    public static Uri addFragment(Uri uri, String fragment) {
+        return Uri.parse(uri.toString() + "#" + fragment);
     }
 
     /**

@@ -59,7 +59,7 @@ public class StocksViewHolder extends RecyclerView.ViewHolder {
                     context.startActivity(intent);
                 } else if(1 == type){
                     // 详情页
-                    new OperationPopWindow(context).show((Activity) context,stockEntity);
+                    new OperationPopWindow(context,stockEntity).show((Activity) context);
                 }
             }
         });

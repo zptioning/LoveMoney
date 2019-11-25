@@ -5,9 +5,9 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 
 import com.zptioning.module_funds.StockEntity;
@@ -24,18 +24,39 @@ public class OperationPopWindow extends PopupWindow {
 
     private Context mContext;
     private StockEntity mStockEntity;
+    private boolean mBNewBuy;
+    private final View mView;
 
-    public OperationPopWindow(Context context) {
+    public OperationPopWindow(Context context, StockEntity stockEntity) {
         super(context);
         mContext = context;
-        View view = LayoutInflater.from(context).inflate(R.layout.pop_window_operation, null);
+        mStockEntity = stockEntity;
+        mView = LayoutInflater.from(context).inflate(R.layout.pop_window_operation, null);
         setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        setContentView(view);
+        setContentView(mView);
         setTouchable(true);
         setFocusable(true);
         setOutsideTouchable(true);
         setBackgroundDrawable(new BitmapDrawable());
+        initListeners();
+    }
+
+    private void initListeners() {
+        ((EditText) mView.findViewById(R.id.et_code1)).setText(mStockEntity.code);
+        mView.findViewById(R.id.btn_buy).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        mView.findViewById(R.id.btn_buy).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     /**
@@ -47,14 +68,11 @@ public class OperationPopWindow extends PopupWindow {
         }
     }
 
-    public void show(Activity context, StockEntity stockEntity) {
-        mStockEntity = stockEntity;
-        if (!(context instanceof Activity)) {
-            return;
+    public OperationPopWindow setNewBuy(boolean bNewBuy) {
+        mBNewBuy = bNewBuy;
+        if (mBNewBuy) {
+            mView.findViewById(R.id.btn_sold).setVisibility(View.GONE);
         }
-        if (null == stockEntity) {
-            return;
-        }
-        show(context);
+        return this;
     }
 }

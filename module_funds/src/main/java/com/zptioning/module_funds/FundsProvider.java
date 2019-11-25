@@ -86,6 +86,7 @@ import androidx.annotation.Nullable;
 public class FundsProvider extends ContentProvider {
 
 
+    /** scheme:[//[user:password@]host[:port]][/]path[?query][#fragment] */
     static {
         String uri = "http://www.zpan.com:8080/lujing/path.htm?id=10&name=zhangsan&old=24#zuihoude";
         Uri mUri = Uri.parse(uri);
@@ -287,14 +288,24 @@ public class FundsProvider extends ContentProvider {
 
         String tableName = getTableName(uri);
 
-        Cursor queryCursor = mDb.query(tableName,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder,
-                null);
+        if (TextUtils.equals(tableName, FundsDBOpenHelper.TABLE_NAME_OTHER)) {
+            tableName = uri.getFragment();
+        }
+
+        Cursor queryCursor = null;
+        try {
+            queryCursor = mDb.query(tableName,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder,
+                    null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 
         if (null != queryCursor) {
             Log.d(TAG, "query ==> " + queryCursor.getCount());
