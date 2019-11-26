@@ -39,6 +39,9 @@ public class Datautils {
 
     private static final String TAG = Datautils.class.getSimpleName() + "_tag";
 
+    public static final int ROUNDING_MODE = 3;
+
+
     private static final String COL_ID = "_id";
     private static final String COL_INDEX = "_index";
     private static final String COL_TIME = "time";
@@ -172,8 +175,14 @@ public class Datautils {
         values.put(COL_HOLD, stockEntity.hold);
         values.put(COL_SOLD, stockEntity.sold);
 
-        int update = contentResolver.update(uri, values,
-                "code = ?", new String[]{stockEntity.code});
+        String fragment = uri.getFragment();
+        if (null == fragment) {
+            int update = contentResolver.update(uri, values,
+                    "code = ?", new String[]{stockEntity.code});
+        } else {
+            int update = contentResolver.update(uri, values,
+                    "_index = ?", new String[]{String.valueOf(stockEntity.index)});
+        }
     }
 
     /**
@@ -199,8 +208,17 @@ public class Datautils {
             String code = cursor.getString(cursor.getColumnIndex(COL_CODE));
             String name = cursor.getString(cursor.getColumnIndex(COL_NAME));
             String cost = cursor.getString(cursor.getColumnIndex(COL_COST));
+            if (null == cost) {
+                cost = "0";
+            }
             String price = cursor.getString(cursor.getColumnIndex(COL_PRICE));
+            if (null == price) {
+                price = "0";
+            }
             String rate = cursor.getString(cursor.getColumnIndex(COL_RATE));
+            if (null == rate) {
+                rate = "0";
+            }
             int count = cursor.getInt(cursor.getColumnIndex(COL_COUNT));
             int operation = cursor.getInt(cursor.getColumnIndex(COL_OPERATION));
             int status = cursor.getInt(cursor.getColumnIndex(COL_STATUS));
@@ -305,5 +323,8 @@ public class Datautils {
         return format;
     }
 
+    public static BigDecimal getRate(BigDecimal cost, BigDecimal price) {
+        return price.subtract(cost).divide(cost, ROUNDING_MODE, BigDecimal.ROUND_HALF_UP);
+    }
 
 }

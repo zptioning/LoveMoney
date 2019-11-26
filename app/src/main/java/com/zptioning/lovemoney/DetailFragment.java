@@ -67,9 +67,9 @@ public class DetailFragment extends BaseFragment {
                 StockEntity stockEntity = new StockEntity();
                 int itemCount = mStocksAdapter.getItemCount();
                 if (0 == itemCount) {
-                    stockEntity.index = 0;
+                    stockEntity.index = 1;
                 } else {
-                    stockEntity.index = itemCount;
+                    stockEntity.index = itemCount + 1;
                 }
                 stockEntity.code = sCode;
                 new OperationPopWindow(_mActivity, stockEntity)
@@ -80,7 +80,7 @@ public class DetailFragment extends BaseFragment {
                                 Datautils.insert(mContentResolver, mUri, stockEntity);
                             }
                         })
-                        .setNewBuy(true).show(_mActivity);
+                        .setOnlyBuy(true).show(_mActivity);
             }
         });
 
@@ -118,11 +118,14 @@ public class DetailFragment extends BaseFragment {
         }
         Log.e("updateAllData_tag", stockEntities.toString());
         StockEntity remoteData = Datautils.getRemoteData(sCode);
-        for (int i = 0; i < stockEntities.size(); i++) {
-            StockEntity stockEntity = stockEntities.get(i);
-            stockEntity.price = remoteData.price;
-            stockEntity.rate = stockEntity.price.subtract(stockEntity.cost).divide(stockEntity.cost);
+        if (null != remoteData) {
+            for (int i = 0; i < stockEntities.size(); i++) {
+                StockEntity stockEntity = stockEntities.get(i);
+                stockEntity.price = remoteData.price;
+                stockEntity.rate = Datautils.getRate(stockEntity.cost, stockEntity.price);
+            }
         }
+
 
         mStocksAdapter.replaceData(stockEntities);
     }
@@ -136,6 +139,7 @@ public class DetailFragment extends BaseFragment {
             case "TIME":
                 break;
             case "CODE":
+                viewById.setVisibility(View.GONE);
                 break;
             case "NAME":
                 break;

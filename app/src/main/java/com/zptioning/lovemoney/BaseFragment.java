@@ -21,6 +21,7 @@ import com.zptioning.module_widgets.adapter.StocksAdapter;
 import com.zptioning.module_widgets.custom_view.CustomItemDecoration;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -159,7 +160,15 @@ public abstract class BaseFragment extends Fragment {
                 TextView viewById = (TextView) mRootView.findViewById(resIDs[ordinal]);
 
                 viewById.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                addClickListener(viewById, enum_title, ordinal);
+//                addClickListener(viewById, enum_title, ordinal);
+                if (null == enum_title || null == name || null == viewById) {
+                    continue;
+                }
+
+                viewById.setVisibility(View.VISIBLE);
+                viewById.setText(String.format("%02d", ordinal) + ":" + /*titles[ordinal]*/enum_title.getValue());
+
+                updateLines(viewById, enum_title);
             }
         }
     }
@@ -182,7 +191,7 @@ public abstract class BaseFragment extends Fragment {
         }
 
         viewById.setVisibility(View.VISIBLE);
-        viewById.setText(String.format("%02d", ordinal) + ":" + titles[ordinal]);
+        viewById.setText(String.format("%02d", ordinal) + ":" + /*titles[ordinal]*/enum_title.getValue());
 
         updateLines(viewById, enum_title);
     }
@@ -204,6 +213,8 @@ public abstract class BaseFragment extends Fragment {
      * @param stockContentUri
      */
     protected void insertStock(StockEntity stockEntity, Uri stockContentUri) {
+        List<StockEntity> stockEntities = Datautils.queryAllStocks(mContentResolver, stockContentUri);
+        stockEntity.index = stockEntities.size() + 1;
         Uri uri = Datautils.insert(mContentResolver, stockContentUri, stockEntity);
         if (null == uri) {
             Toast.makeText(_mActivity, "股票已存在！！", Toast.LENGTH_SHORT).show();

@@ -37,9 +37,9 @@ public class StockEntity {
     public BigDecimal cost;// 成本价 在主页面表示成本价  在详情页 表示买入或者卖出的价格
     public BigDecimal price;// 市场价
     public BigDecimal rate;// 涨幅
-    public int count;// 数量
     public int operation;// 操作   1:买入  2:卖出
     public int status;// 状态   1:持有  2:非持有
+    public int count;// 数量
     public int hold;// 持有 数量
     public int sold;// 已经卖出  数量
 

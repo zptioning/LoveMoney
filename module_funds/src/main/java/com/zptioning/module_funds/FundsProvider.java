@@ -146,7 +146,7 @@ public class FundsProvider extends ContentProvider {
      */
     @Override
     public boolean onCreate() {
-        Log.d(TAG, "onCreate ==> ");
+        Log.d(TAG, "FundsProvider : onCreate ==> ");
         mContext = getContext();
         mDBHelper = new FundsDBOpenHelper(mContext);
         mDb = mDBHelper.getReadableDatabase();
@@ -306,7 +306,7 @@ public class FundsProvider extends ContentProvider {
         }
 
         if (null != queryCursor) {
-            Log.d(TAG, "query ==> " + queryCursor.getCount());
+            Log.d(TAG, tableName + " : query ==> " + queryCursor.getCount());
         }
 
         return queryCursor;

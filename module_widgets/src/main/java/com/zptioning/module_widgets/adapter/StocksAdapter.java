@@ -13,6 +13,7 @@ import com.zptioning.module_widgets.R;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
 import com.zptioning.module_widgets.viewholder.StocksViewHolder;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -99,7 +100,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
                         holder.setText(holder.mTextViews[ordinal], stockEntity.price.toString());
                         break;
                     case "RATE":
-                        holder.setText(holder.mTextViews[ordinal], stockEntity.rate.toString());
+                        BigDecimal multiply = stockEntity.rate.multiply(new BigDecimal(100)).stripTrailingZeros();
+                        holder.setText(holder.mTextViews[ordinal], multiply.toString()+ "%");
                         break;
                     case "COUNT":
                         holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.count));
@@ -129,12 +131,14 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
                         holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.index));
                         break;
                     case "TIME":
+                        holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                         holder.setText(holder.mTextViews[ordinal], Datautils.dateFormat(stockEntity.time));
                         break;
                     case "CODE":
                         holder.setText(holder.mTextViews[ordinal], stockEntity.code);
                         break;
                     case "NAME":
+                        holder.mTextViews[ordinal].setVisibility(View.GONE);
                         holder.setText(holder.mTextViews[ordinal], stockEntity.name);
                         break;
                     case "COST":
@@ -144,7 +148,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
                         holder.setText(holder.mTextViews[ordinal], stockEntity.price.toString());
                         break;
                     case "RATE":
-                        holder.setText(holder.mTextViews[ordinal], stockEntity.rate.toString());
+                        BigDecimal multiply = stockEntity.rate.multiply(new BigDecimal(100)).stripTrailingZeros();
+                        holder.setText(holder.mTextViews[ordinal], multiply.toString() + "%");
                         break;
                     case "COUNT":
                         holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.count));
@@ -152,6 +157,11 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksViewHolder> {
                     case "OPTION":
                         holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.operation));
                         holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        if (1 == stockEntity.status) {
+                            holder.mTextViews[ordinal].setText("卖吗？");
+                        } else {
+                            holder.mTextViews[ordinal].setText("买吗？");
+                        }
                         holder.setOnClickOptionListener(mContext, holder.mTextViews[ordinal], stockEntity, mType);
                         break;
                     case "SOLD":

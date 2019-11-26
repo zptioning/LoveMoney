@@ -102,7 +102,7 @@ public class FundsDBOpenHelper extends SQLiteOpenHelper {
                 .append(" ); ").toString();
 
         db.execSQL(createStatement);
-        Log.d(TAG, "onCreate ==> " + createStatement);
+        Log.d(TAG, tableName + " : onCreate ==> " + createStatement);
     }
 
     /**

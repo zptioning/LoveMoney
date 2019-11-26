@@ -80,7 +80,7 @@ public class StocksViewHolder extends RecyclerView.ViewHolder {
                     context.startActivity(intent);
                 } else if (1 == type) {
                     // 详情页
-                    new OperationPopWindow(context, stockEntity)
+                    OperationPopWindow operationPopWindow = new OperationPopWindow(context, stockEntity)
                             .setOnBuyListener(new OperationPopWindow.OnBuyListener() {
                                 @Override
                                 public void onBuy(StockEntity stockEntity) {
@@ -96,8 +96,13 @@ public class StocksViewHolder extends RecyclerView.ViewHolder {
                                         mOnSellListener.onSell(stockEntity);
                                     }
                                 }
-                            })
-                            .show((Activity) context);
+                            });
+                    if (stockEntity.status == 1) {
+                        operationPopWindow.setOnlySell();
+                    } else {
+                        operationPopWindow.setOnlyBuy(false);
+                    }
+                    operationPopWindow.show((Activity) context);
                 }
             }
         });

@@ -24,6 +24,9 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import static com.zptioning.module_funds.Datautils.ROUNDING_MODE;
+import static java.math.BigDecimal.ROUND_HALF_UP;
+
 /**
  * @ClassName MainFragment
  * @Author zptioning
@@ -112,10 +115,15 @@ public class MainFragment extends BaseFragment {
     protected void updateAllData() {
         List<StockEntity> stockEntities = Datautils.queryAllStocks(_mActivity.getContentResolver(),
                 FundsProvider.STOCK_CONTENT_URI);
-        // TODO: 2019-11-22  读取到所有的股票信息后，根据股票名，查询每个股票对应的表中的详细信息。
         updateAllDataWithRemoteData(stockEntities);
         calculateWithLocalData(stockEntities);
         mStocksAdapter.replaceData(stockEntities);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateAllData();
     }
 
     /**
@@ -142,17 +150,20 @@ public class MainFragment extends BaseFragment {
                 StockEntity detailEntity = detailList.get(j);
                 if (detailEntity.status == 1)// 持有
                 {
-                    allHold += detailEntity.hold;
-                    cost = cost.add(detailEntity.cost.multiply(detailEntity.cost));
+                    allHold += detailEntity.count;
+                    cost = cost.add(detailEntity.cost.multiply(new BigDecimal(detailEntity.count)));
                 } else {
-                    allSold += detailEntity.sold;
+                    allSold += detailEntity.count;
                 }
             }
             stockEntity.hold = allHold;
             stockEntity.sold = allSold;
             stockEntity.count = allHold + allSold;
-            stockEntity.cost = cost.divide(new BigDecimal(allHold));
-            stockEntity.rate = cost.subtract(stockEntity.price).divide(cost);
+            if (0 == allHold) {
+                continue;
+            }
+            stockEntity.cost = cost.divide(new BigDecimal(allHold), ROUNDING_MODE, ROUND_HALF_UP);
+            stockEntity.rate = Datautils.getRate(stockEntity.cost, stockEntity.price);
         }
     }
 
@@ -169,6 +180,9 @@ public class MainFragment extends BaseFragment {
         for (int i = 0; i < stockEntities.size(); i++) {
             StockEntity stockEntity = stockEntities.get(i);
             StockEntity remoteData = Datautils.getRemoteData(stockEntity.code);
+            if (null == remoteData) {
+                continue;
+            }
             stockEntity.price = remoteData.price;
         }
     }

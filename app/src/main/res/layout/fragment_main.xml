@@ -65,7 +65,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,5 +82,10 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:text="    数量：当前组代表多少股\n    状态：1:持有  2:已卖"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

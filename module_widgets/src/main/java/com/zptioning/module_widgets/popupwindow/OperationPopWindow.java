@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
+import com.zptioning.module_funds.Datautils;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_widgets.R;
 
@@ -72,6 +73,7 @@ public class OperationPopWindow extends PopupWindow {
 
                     }
                     mOnBuyListener.onBuy(mStockEntity);
+                    dismiss();
                 }
             }
         });
@@ -86,6 +88,7 @@ public class OperationPopWindow extends PopupWindow {
                     mStockEntity.cost = new BigDecimal(mEtPrice.getText().toString());
                     mStockEntity.status = 2;
                     mOnSellListener.onSell(mStockEntity);
+                    dismiss();
                 }
             }
         });
@@ -100,16 +103,31 @@ public class OperationPopWindow extends PopupWindow {
         }
     }
 
-    public OperationPopWindow setNewBuy(boolean bNewBuy) {
+    public OperationPopWindow setOnlyBuy(boolean bNewBuy) {
         mBNewBuy = bNewBuy;
         if (mBNewBuy) {
             mView.findViewById(R.id.btn_sell).setVisibility(View.GONE);
         } else {
-            mEtCount.setText(mStockEntity.count);
+            mView.findViewById(R.id.btn_sell).setVisibility(View.GONE);
+            mEtCount.setText(mStockEntity.count + "");
             mEtCount.setEnabled(false);
             mEtPrice.setText(mStockEntity.price.toString());
             mEtPrice.setEnabled(false);
         }
+        return this;
+    }
+
+    /**
+     * 只能卖
+     *
+     * @return
+     */
+    public OperationPopWindow setOnlySell() {
+        mView.findViewById(R.id.btn_buy).setVisibility(View.GONE);
+        mEtCount.setText(mStockEntity.count + "");
+        mEtCount.setEnabled(false);
+        mEtPrice.setText(mStockEntity.cost.toString());
+        mEtPrice.setEnabled(false);
         return this;
     }
 
