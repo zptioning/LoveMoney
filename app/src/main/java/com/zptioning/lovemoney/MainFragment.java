@@ -14,9 +14,10 @@ import android.widget.Toast;
 
 import com.zptioning.module_funds.Datautils;
 import com.zptioning.module_funds.FundsProvider;
+import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
-import com.zptioning.module_widgets.adapter.StocksAdapter;
+import com.zptioning.module_widgets.adapter.MainAdapter;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -44,7 +45,7 @@ public class MainFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mType = TYPE_MAIN_FRAGEMNT;
+        mType = StockConstants.TYPE_MAIN;
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -104,7 +105,7 @@ public class MainFragment extends BaseFragment {
 
     @Override
     protected void initAdapter() {
-        mStocksAdapter = new StocksAdapter(mType, null);
+        mBaseAdapter = new MainAdapter(mType, null);
     }
 
     /**
@@ -117,7 +118,7 @@ public class MainFragment extends BaseFragment {
                 FundsProvider.STOCK_CONTENT_URI);
         updateAllDataWithRemoteData(stockEntities);
         calculateWithLocalData(stockEntities);
-        mStocksAdapter.replaceData(stockEntities);
+        mBaseAdapter.replaceData(stockEntities);
     }
 
     @Override

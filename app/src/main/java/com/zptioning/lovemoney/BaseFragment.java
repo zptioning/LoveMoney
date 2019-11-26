@@ -15,9 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface.ENUM_TITLES;
-import com.zptioning.module_widgets.adapter.StocksAdapter;
+import com.zptioning.module_widgets.adapter.BaseAdapter;
 import com.zptioning.module_widgets.custom_view.CustomItemDecoration;
 
 import java.util.EnumSet;
@@ -57,29 +58,12 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 0:mainfragment  1:detailfragment
      */
-    protected int mType = TYPE_MAIN_FRAGEMNT;
+    protected int mType = StockConstants.TYPE_MAIN;
 
     private RecyclerView mRvStocks;
     protected String strExchange = "";
 
-
-    protected StocksAdapter mStocksAdapter;
-
-
-    private String[] titles = {
-            "索引",
-            "时间",
-            "代码",
-            "名称",
-            "成本",
-            "现价",
-            "涨幅",
-            "数量",
-            "操作",
-            "已卖",
-            "持有",
-            "状态",
-    };
+    protected BaseAdapter mBaseAdapter;
 
     public int[] resIDs = {
             R.id.tv_0,
@@ -141,13 +125,7 @@ public abstract class BaseFragment extends Fragment {
         mRvStocks.setLayoutManager(linearLayoutManager);
         mRvStocks.addItemDecoration(new CustomItemDecoration());
         initAdapter();
-
-//        if(mType == 0) {
-//            mStocksAdapter = new StocksAdapter(mType, null);
-//        }else {
-//            mStocksAdapter = new StocksAdapter(mType,null);
-//        }
-        mRvStocks.setAdapter(mStocksAdapter);
+        mRvStocks.setAdapter(mBaseAdapter);
     }
 
     private void initEnums() {
@@ -157,16 +135,15 @@ public abstract class BaseFragment extends Fragment {
             String value = enum_title.getValue();
             int ordinal = enum_title.ordinal();
             if (ordinal < resIDs.length) {
-                TextView viewById = (TextView) mRootView.findViewById(resIDs[ordinal]);
+                TextView viewById = mRootView.findViewById(resIDs[ordinal]);
 
                 viewById.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-//                addClickListener(viewById, enum_title, ordinal);
+                viewById.setVisibility(View.VISIBLE);
                 if (null == enum_title || null == name || null == viewById) {
                     continue;
                 }
 
-                viewById.setVisibility(View.VISIBLE);
-                viewById.setText(String.format("%02d", ordinal) + ":" + /*titles[ordinal]*/enum_title.getValue());
+                viewById.setText(String.format("%02d", ordinal) + ":" + value);
 
                 updateLines(viewById, enum_title);
             }
@@ -180,21 +157,6 @@ public abstract class BaseFragment extends Fragment {
      */
     protected abstract void updateAllData();
 
-    /**
-     * @param viewById
-     * @param enum_title
-     * @param ordinal
-     */
-    private void addClickListener(TextView viewById, ENUM_TITLES enum_title, int ordinal) {
-        if (null == enum_title || null == enum_title.name() || null == viewById) {
-            return;
-        }
-
-        viewById.setVisibility(View.VISIBLE);
-        viewById.setText(String.format("%02d", ordinal) + ":" + /*titles[ordinal]*/enum_title.getValue());
-
-        updateLines(viewById, enum_title);
-    }
 
     /**
      * 更新列

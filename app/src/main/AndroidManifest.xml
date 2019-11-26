@@ -11,8 +11,9 @@
         android:theme="@style/AppTheme">
         <activity android:name=".DetailActivity">
             <intent-filter>
-                <action android:name="com.zption.DetailActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="com.zption.DetailActivity" />
+                <!-- 必须加这个 否则 跨模块隐式调用会崩溃 -->
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity">
@@ -20,6 +21,13 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".HistoryActivity">
+            <intent-filter>
+                <action android:name="com.zption.HistoryActivity" />
+                <!-- 必须加这个 否则 跨模块隐式调用会崩溃 -->
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>

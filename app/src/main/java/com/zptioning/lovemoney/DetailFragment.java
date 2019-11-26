@@ -2,6 +2,7 @@ package com.zptioning.lovemoney;
 
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,9 +15,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
-import com.zptioning.module_widgets.adapter.StocksAdapter;
+import com.zptioning.module_widgets.adapter.DetailAdapter;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
 
 import java.util.List;
@@ -46,7 +48,7 @@ public class DetailFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mType = TYPE_DETAIL_FRAGEMNT;
+        mType = StockConstants.TYPE_DETAIL;
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -65,7 +67,7 @@ public class DetailFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 StockEntity stockEntity = new StockEntity();
-                int itemCount = mStocksAdapter.getItemCount();
+                int itemCount = mBaseAdapter.getItemCount();
                 if (0 == itemCount) {
                     stockEntity.index = 1;
                 } else {
@@ -90,12 +92,13 @@ public class DetailFragment extends BaseFragment {
 
     @Override
     protected void initAdapter() {
-        mStocksAdapter = new StocksAdapter(mType, null,
+        mBaseAdapter = new DetailAdapter(mType, null,
                 new OperationPopWindow.OnBuyListener() {
                     @Override
                     public void onBuy(StockEntity stockEntity) {
                         // 买入操作
                         Datautils.update(mContentResolver, mUri, stockEntity);
+                        Datautils.insert(mContentResolver, ContentUris.withAppendedId(mUri, stockEntity.index), stockEntity);
                     }
                 },
                 new OperationPopWindow.OnSellListener() {
@@ -103,6 +106,7 @@ public class DetailFragment extends BaseFragment {
                     public void onSell(StockEntity stockEntity) {
                         // 卖出操作
                         Datautils.update(mContentResolver, mUri, stockEntity);
+                        Datautils.insert(mContentResolver, ContentUris.withAppendedId(mUri, stockEntity.index), stockEntity);
                     }
                 });
     }
@@ -127,7 +131,7 @@ public class DetailFragment extends BaseFragment {
         }
 
 
-        mStocksAdapter.replaceData(stockEntities);
+        mBaseAdapter.replaceData(stockEntities);
     }
 
     @Override

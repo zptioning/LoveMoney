@@ -1,6 +1,7 @@
 package com.zptioning.module_funds;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -116,9 +117,15 @@ public class Datautils {
     public static Uri insert(ContentResolver contentResolver, Uri uri, StockEntity stockEntity) {
         ContentValues values = new ContentValues();
         String strTables = _QueryAllTables(contentResolver);
-        if (TextUtils.isEmpty(strTables) || !strTables.contains("#" + stockEntity.code)) {
+        if (TextUtils.isEmpty(strTables)
+                || !strTables.contains("#" + stockEntity.code + "#")
+                || !strTables.contains("#" + stockEntity.code + "_" + stockEntity.index + "#")) {
             // TODO: 2019-11-25 创建 code 表
-            _CreateTableIfNotExist(contentResolver, stockEntity.code);
+            if (-1 == ContentUris.parseId(uri)) {// 如果没有id 创建 code表
+                _CreateTableIfNotExist(contentResolver, stockEntity.code);
+            } else {// 如果有id 创建 code_index 表
+                _CreateTableIfNotExist(contentResolver, stockEntity.code + "_" + stockEntity.index);
+            }
         }
 
         values.put(COL_INDEX, stockEntity.index);
