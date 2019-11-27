@@ -31,9 +31,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new NotificationUtils().sendNotification(this,
-                "老夫在后台运行", "不准Kill"
-                , NotificationUtils.NOTIFICATION_ID_STOCK);
+
+        new NotificationUtils().handleMedicineImmediately(this);
 
 
         IntentFilter intentFilter = new IntentFilter();

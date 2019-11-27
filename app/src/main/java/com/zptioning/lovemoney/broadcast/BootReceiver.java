@@ -32,28 +32,10 @@ public class BootReceiver extends BroadcastReceiver {
                 Toast.makeText(context, "boot", Toast.LENGTH_SHORT).show();
                 break;
             case Intent.ACTION_TIME_TICK:
-                handleMedicine(context);
+                new NotificationUtils().handleMedicine(context);
                 break;
         }
     }
 
-    private void handleMedicine(Context context) {
-        long timeMillis = System.currentTimeMillis();
-        String dateFormat = Datautils.dateFormat("MM-dd HH", timeMillis);
-        String hour = Datautils.dateFormat("HH", timeMillis);
-        long today = timeMillis / 1000 / 60 / 60 / 24;
-        if (hour.equals("20")) {
-            // 第一步
-            SharedPreferences sp = context.getSharedPreferences(NotificationUtils.SPNAME, Context.MODE_PRIVATE);
-            long lastDay = sp.getLong(NotificationUtils.KEY_TIME1, today - 4);
-            if (today != lastDay && (today - lastDay) % 4 == 0) {
-                new NotificationUtils().sendMedicine(context, dateFormat, today, "RGXMZ", NotificationUtils.NOTIFICATION_ID_RRXMZ);
-            }
-            // 第二步
-            String date = sp.getString(NotificationUtils.KEY_TIME, null);
-            if (!TextUtils.equals(dateFormat, date)) {// 当前已经发送通知了 则返回
-                new NotificationUtils().sendMedicine(context, dateFormat, NotificationUtils.NOTIFICATION_ID_STOCK);
-            }
-        }
-    }
+
 }

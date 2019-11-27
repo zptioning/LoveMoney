@@ -10,6 +10,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.zptioning.module_funds.Datautils;
+
 /**
  * 通知管理工具类
  */
@@ -23,9 +25,9 @@ public class NotificationUtils {
     public static final String KEY_DD = "dd";
     public static final String KEY_TIME = "time";
     public static final String KEY_TIME1 = "time1";
-//    public static final String KEY_COUNT = "count";
-    public static final String VALUE_ZZJN = "zzjn";
-    public static final String VALUE_HLS = "hls";
+    //    public static final String KEY_COUNT = "count";
+    public static final String VALUE_ZZJN = "ZZJN";
+    public static final String VALUE_HLS = "HLS";
 
     public void sendNotification(Context context,
                                  String contentTitle,
@@ -48,7 +50,12 @@ public class NotificationUtils {
             builder.setChannelId("dao_id");
         }
 
+        // 手动删不掉
         builder.setOngoing(true);
+        // 添加默认声音提醒
+        builder.setDefaults(Notification.DEFAULT_SOUND);
+        // 添加默认呼吸灯提醒，自动添加FLAG_SHOW_LIGHTS
+        builder.setDefaults(Notification.DEFAULT_LIGHTS);
 
         // 点击通知后跳转到MainActivity
         try {
@@ -107,7 +114,7 @@ public class NotificationUtils {
      * @param context
      * @param notificationIdStock
      */
-    public void sendMedicine(Context context, String dateFormat,long day, String strContext, int notificationIdStock) {
+    public void sendMedicine(Context context, String dateFormat, long day, String strContext, int notificationIdStock) {
         SharedPreferences sp = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = sp.edit();
         edit.putLong(KEY_TIME1, day).commit();
@@ -127,5 +134,50 @@ public class NotificationUtils {
             edit.putString(KEY_DD, VALUE_ZZJN);
         }
         edit.commit();
+    }
+
+    public void handleMedicineImmediately(Context context) {
+        long timeMillis = System.currentTimeMillis();
+        long today = timeMillis / 1000 / 60 / 60 / 24;
+        // 第一步
+        SharedPreferences sp = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
+        long lastDay = sp.getLong(KEY_TIME1, today - 4);
+        String dateFormat = Datautils.dateFormat("MM-dd HH", timeMillis);
+        if ((today - lastDay) % 4 == 0) {
+            sendNotification(context, dateFormat, "RGXMZ", NOTIFICATION_ID_RRXMZ);
+        }
+
+        // 第二步
+        String lastDate = sp.getString(KEY_TIME, null);
+        String dd = sp.getString(KEY_DD, null);
+        if (!TextUtils.equals(dateFormat, lastDate)) {
+            if (TextUtils.equals(dd, VALUE_ZZJN)) {
+                sendNotification(context, dateFormat, "HLS", NOTIFICATION_ID_STOCK);
+            } else {
+                sendNotification(context, dateFormat, "ZZJN", NOTIFICATION_ID_STOCK);
+            }
+        }else{
+            sendNotification(context, dateFormat, dd, NOTIFICATION_ID_STOCK);
+        }
+    }
+
+    public void handleMedicine(Context context) {
+        long timeMillis = System.currentTimeMillis();
+        String dateFormat = Datautils.dateFormat("MM-dd HH", timeMillis);
+        String hour = Datautils.dateFormat("HH", timeMillis);
+        long today = timeMillis / 1000 / 60 / 60 / 24;
+        if (hour.equals("20")) {
+            // 第一步
+            SharedPreferences sp = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
+            long lastDay = sp.getLong(KEY_TIME1, today - 4);
+            if (today != lastDay && (today - lastDay) % 4 == 0) {
+                sendMedicine(context, dateFormat, today, "RGXMZ", NOTIFICATION_ID_RRXMZ);
+            }
+            // 第二步
+            String date = sp.getString(KEY_TIME, null);
+            if (!TextUtils.equals(dateFormat, date)) {// 当前已经发送通知了 则返回
+                sendMedicine(context, dateFormat, NOTIFICATION_ID_STOCK);
+            }
+        }
     }
 }
