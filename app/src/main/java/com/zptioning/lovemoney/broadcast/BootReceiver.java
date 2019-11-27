@@ -41,18 +41,16 @@ public class BootReceiver extends BroadcastReceiver {
         long timeMillis = System.currentTimeMillis();
         String dateFormat = Datautils.dateFormat("MM-dd HH", timeMillis);
         String hour = Datautils.dateFormat("HH", timeMillis);
+        long today = timeMillis / 1000 / 60 / 60 / 24;
         if (hour.equals("20")) {
             // 第一步
             SharedPreferences sp = context.getSharedPreferences(NotificationUtils.SPNAME, Context.MODE_PRIVATE);
-            int count = sp.getInt(NotificationUtils.KEY_COUNT, 0);
-            String date = sp.getString(NotificationUtils.KEY_TIME1, null);
-            if (!TextUtils.equals(dateFormat, date) && count % 4 == 0) {
-                new NotificationUtils().sendMedicine(context, dateFormat, "RGXMZ", NotificationUtils.NOTIFICATION_ID_RRXMZ);
+            long lastDay = sp.getLong(NotificationUtils.KEY_TIME1, today - 4);
+            if (today != lastDay && (today - lastDay) % 4 == 0) {
+                new NotificationUtils().sendMedicine(context, dateFormat, today, "RGXMZ", NotificationUtils.NOTIFICATION_ID_RRXMZ);
             }
-            count++;
-            sp.edit().putInt(NotificationUtils.KEY_COUNT, count).commit();
             // 第二步
-            date = sp.getString(NotificationUtils.KEY_TIME, null);
+            String date = sp.getString(NotificationUtils.KEY_TIME, null);
             if (!TextUtils.equals(dateFormat, date)) {// 当前已经发送通知了 则返回
                 new NotificationUtils().sendMedicine(context, dateFormat, NotificationUtils.NOTIFICATION_ID_STOCK);
             }

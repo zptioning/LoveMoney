@@ -23,7 +23,7 @@ public class NotificationUtils {
     public static final String KEY_DD = "dd";
     public static final String KEY_TIME = "time";
     public static final String KEY_TIME1 = "time1";
-    public static final String KEY_COUNT = "count";
+//    public static final String KEY_COUNT = "count";
     public static final String VALUE_ZZJN = "zzjn";
     public static final String VALUE_HLS = "hls";
 
@@ -107,10 +107,10 @@ public class NotificationUtils {
      * @param context
      * @param notificationIdStock
      */
-    public void sendMedicine(Context context, String dateFormat, String strContext, int notificationIdStock) {
+    public void sendMedicine(Context context, String dateFormat,long day, String strContext, int notificationIdStock) {
         SharedPreferences sp = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = sp.edit();
-        edit.putString(KEY_TIME1, dateFormat);
+        edit.putLong(KEY_TIME1, day).commit();
         sendNotification(context, dateFormat, strContext, notificationIdStock);
     }
 
