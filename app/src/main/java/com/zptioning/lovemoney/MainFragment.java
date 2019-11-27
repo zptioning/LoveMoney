@@ -1,6 +1,7 @@
 package com.zptioning.lovemoney;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -103,6 +104,37 @@ public class MainFragment extends BaseFragment {
         });
     }
 
+
+    /**
+     * 插入指定股票信息
+     *
+     * @param stockEntity
+     * @param stockContentUri
+     */
+    protected void insertStock(StockEntity stockEntity, Uri stockContentUri) {
+        if (null == stockEntity) {
+            return;
+        }
+        List<StockEntity> stockEntities = Datautils.queryAllStocks(mContentResolver, stockContentUri);
+        stockEntity.index = stockEntities.size() + 1;
+
+        Uri uri = Datautils.insert(mContentResolver,
+                Datautils.addStockFragment(stockEntity.code), stockEntity);
+
+        if (null == uri) {
+            Toast.makeText(_mActivity, "股票已存在！！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        long id = ContentUris.parseId(uri);
+        if (-1 == id) {
+            Toast.makeText(_mActivity, "插入失败", Toast.LENGTH_SHORT).show();
+        } else {
+            // 查询当前数据库 有 哪些表
+//            queryResult(mContentResolver, stockContentUri);
+            updateAllData();
+        }
+    }
+
     @Override
     protected void initAdapter() {
         mBaseAdapter = new MainAdapter(mType, null);
@@ -114,6 +146,7 @@ public class MainFragment extends BaseFragment {
      */
     @Override
     protected void updateAllData() {
+        super.updateAllData();
         List<StockEntity> stockEntities = Datautils.queryAllStocks(_mActivity.getContentResolver(),
                 FundsProvider.STOCK_CONTENT_URI);
         updateAllDataWithRemoteData(stockEntities);
@@ -124,7 +157,10 @@ public class MainFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateAllData();
+        if (!mBFirst) {
+            updateAllData();
+        }
+        mBFirst = false;
     }
 
     /**
@@ -149,7 +185,7 @@ public class MainFragment extends BaseFragment {
             BigDecimal rate = new BigDecimal("0");// 涨跌幅
             for (int j = 0; j < detailList.size(); j++) {
                 StockEntity detailEntity = detailList.get(j);
-                if (detailEntity.status == 1)// 持有
+                if (detailEntity.status == StockConstants.hold)// 持有
                 {
                     allHold += detailEntity.count;
                     cost = cost.add(detailEntity.cost.multiply(new BigDecimal(detailEntity.count)));
@@ -221,10 +257,5 @@ public class MainFragment extends BaseFragment {
             default:
                 break;
         }
-    }
-
-    @Override
-    protected void queryResult(ContentResolver contentResolver, Uri stockContentUri) {
-        Datautils._QueryAllTables(contentResolver);
     }
 }

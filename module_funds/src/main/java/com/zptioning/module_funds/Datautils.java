@@ -1,7 +1,6 @@
 package com.zptioning.module_funds;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -100,7 +99,7 @@ public class Datautils {
         stockEntity.rate = new BigDecimal("0");
         stockEntity.count = 0;
         stockEntity.operation = 0;
-        stockEntity.status = 2;
+        stockEntity.status = StockConstants.sold;
         stockEntity.hold = 0;
         stockEntity.sold = 0;
 
@@ -109,7 +108,7 @@ public class Datautils {
 
 
     /**
-     * 增：插入数据 到总表中
+     * 增：插入数据 到表中
      *
      * @param contentResolver
      * @param stockEntity     return null 如果股票已经存在
@@ -120,12 +119,8 @@ public class Datautils {
         if (TextUtils.isEmpty(strTables)
                 || !strTables.contains("#" + stockEntity.code + "#")
                 || !strTables.contains("#" + stockEntity.code + "_" + stockEntity.index + "#")) {
-            // TODO: 2019-11-25 创建 code 表
-            if (-1 == ContentUris.parseId(uri)) {// 如果没有id 创建 code表
-                _CreateTableIfNotExist(contentResolver, stockEntity.code);
-            } else {// 如果有id 创建 code_index 表
-                _CreateTableIfNotExist(contentResolver, stockEntity.code + "_" + stockEntity.index);
-            }
+            String fragment = uri.getFragment();
+            _CreateTableIfNotExist(contentResolver, fragment);
         }
 
         values.put(COL_INDEX, stockEntity.index);
@@ -254,48 +249,33 @@ public class Datautils {
     }
 
     /**
-     * 创建数据表
+     * 创建某张表
      *
      * @param contentResolver
+     * @param tableName
      */
-    public static void createTable(ContentResolver contentResolver, /*Uri uri,*/ String tableName) {
-        try {
-            Bundle bundle = new Bundle();
-
-            Uri uri = Uri.parse("content://" + FundsProvider.AUTHORITY);
-            Bundle callBundle = contentResolver.call(uri, "createTable", tableName, bundle);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 给uri 添加 fragment
-     *
-     * @param uri
-     * @param fragment
-     * @return
-     */
-    public static Uri addFragment(Uri uri, String fragment) {
-        return Uri.parse(uri.toString() + "#" + fragment);
-    }
-
-    /**
-     * other 类型uri 添加fragment
-     *
-     * @param fragment
-     * @return
-     */
-    public static Uri addOtherFragment(String fragment) {
-        return addFragment(FundsProvider.OTHER_CONTENT_URI, fragment);
-    }
-
-
     public static void _CreateTableIfNotExist(ContentResolver contentResolver, String tableName) {
         Bundle bundle = new Bundle();
         bundle.putString("table_name", tableName);
         Uri uri = Uri.parse("content://" + FundsProvider.AUTHORITY);
         Bundle callBundle = contentResolver.call(uri, "_CreateTableIfNotExist", tableName, bundle);
+    }
+
+    /**
+     * 删除某张表
+     *
+     * @param contentResolver
+     * @param tableName
+     */
+    public static void _DeleteTable(ContentResolver contentResolver, String tableName) {
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString("table_name", tableName);
+            Uri uri = Uri.parse("content://" + FundsProvider.AUTHORITY);
+            Bundle callBundle = contentResolver.call(uri, "_DeleteTable", tableName, bundle);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -315,6 +295,31 @@ public class Datautils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 给uri 添加 fragment
+     *
+     * @param uri
+     * @param fragment
+     * @return
+     */
+    public static Uri addFragment(Uri uri, String fragment) {
+        return Uri.parse(uri.toString() + "#" + fragment);
+    }
+
+    public static Uri addStockFragment(String fragment) {
+        return addFragment(FundsProvider.STOCK_CONTENT_URI, fragment);
+    }
+
+    /**
+     * other 类型uri 添加fragment
+     *
+     * @param fragment
+     * @return
+     */
+    public static Uri addOtherFragment(String fragment) {
+        return addFragment(FundsProvider.OTHER_CONTENT_URI, fragment);
     }
 
     /**

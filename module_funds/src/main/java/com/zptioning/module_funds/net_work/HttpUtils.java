@@ -76,6 +76,7 @@ public final class HttpUtils {
      * 简单的同步get请求
      */
     public String httpGetResult(final String url) {
+        Log.e(TAG, url);
         final StringBuilder sb = new StringBuilder();
         FutureTask<String> futureTask = new FutureTask<String>(new Callable<String>() {
             @Override

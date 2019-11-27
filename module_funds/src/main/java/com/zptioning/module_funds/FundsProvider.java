@@ -197,12 +197,7 @@ public class FundsProvider extends ContentProvider {
         }
 
         if (TextUtils.equals(FundsDBOpenHelper.TABLE_NAME_OTHER, tableName)) {
-            long id = ContentUris.parseId(uri);
-            if (-1 == id) {
                 tableName = uri.getFragment();// sh510300
-            } else {
-                tableName = uri.getFragment() + "_" + id;// sh510300_1
-            }
         }
 
         long insert = mDb.insert(tableName, null, values);

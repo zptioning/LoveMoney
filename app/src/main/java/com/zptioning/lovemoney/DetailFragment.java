@@ -1,8 +1,6 @@
 package com.zptioning.lovemoney;
 
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +19,7 @@ import com.zptioning.module_funds.StockInterface;
 import com.zptioning.module_widgets.adapter.DetailAdapter;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -37,11 +36,13 @@ public class DetailFragment extends BaseFragment {
 
     // 当前页面 股票代码 也是对应股票 数据库中表的名字
     private static String sCode;
+    private static BigDecimal sPrice;
     private Uri mUri = Datautils.addOtherFragment(sCode);
     private StockObserver mStockObserver;
 
-    public static DetailFragment getInstance(String code) {
+    public static DetailFragment getInstance(String code, BigDecimal price) {
         sCode = code;
+        sPrice = price;
         return new DetailFragment();
     }
 
@@ -54,7 +55,7 @@ public class DetailFragment extends BaseFragment {
 
     @Override
     protected int getLayoutID() {
-        return R.layout.fragment_main;
+        return R.layout.fragment_detail;
     }
 
     @Override
@@ -63,9 +64,9 @@ public class DetailFragment extends BaseFragment {
         mRootView.findViewById(R.id.et_code).setVisibility(View.GONE);
         Button btnInsert = mRootView.findViewById(R.id.btn_insert);
         btnInsert.setText("新买一组");
-        btnInsert.setOnClickListener(new View.OnClickListener() {
+        btnInsert.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 StockEntity stockEntity = new StockEntity();
                 int itemCount = mBaseAdapter.getItemCount();
                 if (0 == itemCount) {
@@ -74,15 +75,20 @@ public class DetailFragment extends BaseFragment {
                     stockEntity.index = itemCount + 1;
                 }
                 stockEntity.code = sCode;
+                stockEntity.price = sPrice;
                 new OperationPopWindow(_mActivity, stockEntity)
                         .setOnBuyListener(new OperationPopWindow.OnBuyListener() {
                             @Override
                             public void onBuy(StockEntity stockEntity) {
                                 // 新买入操作
-                                Datautils.insert(mContentResolver, mUri, stockEntity);
+                                Datautils.insert(mContentResolver,
+                                        Datautils.addOtherFragment(stockEntity.code), stockEntity);
+                                Datautils.insert(mContentResolver,
+                                        Datautils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
                             }
                         })
                         .setOnlyBuy(true).show(_mActivity);
+                return true;
             }
         });
 
@@ -98,7 +104,8 @@ public class DetailFragment extends BaseFragment {
                     public void onBuy(StockEntity stockEntity) {
                         // 买入操作
                         Datautils.update(mContentResolver, mUri, stockEntity);
-                        Datautils.insert(mContentResolver, ContentUris.withAppendedId(mUri, stockEntity.index), stockEntity);
+                        Datautils.insert(mContentResolver,
+                                Datautils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
                     }
                 },
                 new OperationPopWindow.OnSellListener() {
@@ -106,7 +113,8 @@ public class DetailFragment extends BaseFragment {
                     public void onSell(StockEntity stockEntity) {
                         // 卖出操作
                         Datautils.update(mContentResolver, mUri, stockEntity);
-                        Datautils.insert(mContentResolver, ContentUris.withAppendedId(mUri, stockEntity.index), stockEntity);
+                        Datautils.insert(mContentResolver,
+                                Datautils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
                     }
                 });
     }
@@ -116,6 +124,7 @@ public class DetailFragment extends BaseFragment {
      */
     @Override
     protected void updateAllData() {
+        super.updateAllData();
         List<StockEntity> stockEntities = Datautils.queryAllStocks(mContentResolver, mUri);
         if (null == stockEntities || stockEntities.size() == 0) {
             return;
@@ -170,10 +179,6 @@ public class DetailFragment extends BaseFragment {
         }
     }
 
-    @Override
-    protected void queryResult(ContentResolver contentResolver, Uri stockContentUri) {
-
-    }
 
     @Override
     public void onDestroy() {

@@ -87,7 +87,7 @@
     <TextView
         android:id="@+id/tv_des"
         android:layout_width="match_parent"
-        android:text="    数量：操作的所有股数\n    卖出：数量中卖出的部分\n    持有：数量中被持有的部分"
+        android:text="    数量：当前组代表多少股\n    成本：状态为持有时表示买入价格，状态为卖出时表示卖出价格"
         android:layout_height="match_parent" />
 
 </LinearLayout>

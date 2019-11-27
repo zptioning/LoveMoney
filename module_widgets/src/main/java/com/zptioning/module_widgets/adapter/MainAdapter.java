@@ -24,7 +24,7 @@ public class MainAdapter extends BaseAdapter {
     }
 
     @Override
-    protected void updateView(@NonNull BaseViewHolder holder, StockEntity stockEntity, StockInterface.ENUM_TITLES enum_title, int ordinal) {
+    protected void updateView(@NonNull BaseViewHolder holder, StockEntity stockEntity, StockInterface.ENUM_TITLES enum_title, int ordinal, int position) {
         switch (enum_title.name()) {
             // 执行买卖操作
             case "INDEX":
@@ -54,7 +54,7 @@ public class MainAdapter extends BaseAdapter {
                 holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.count));
                 break;
             case "OPTION":
-                holder.setText(holder.mTextViews[ordinal], "just click, baby!"/*String.valueOf(stockEntity.operation)*/);
+                holder.setText(holder.mTextViews[ordinal], "向我开炮!"/*String.valueOf(stockEntity.operation)*/);
                 holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                 holder.setOnClickOptionListener(mContext, holder.mTextViews[ordinal], stockEntity, mType);
                 break;

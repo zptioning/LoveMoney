@@ -2,22 +2,26 @@ package com.zptioning.lovemoney;
 
 import android.os.Bundle;
 
+import java.math.BigDecimal;
+
 public class HistoryActivity extends BaseActivity {
 
     private String mCode;
-    private String mIndex;
+    private int mIndex;
+    private BigDecimal mPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mCode = getIntent().getStringExtra("code");
-        mIndex = getIntent().getStringExtra("index");
+        mIndex = getIntent().getIntExtra("index", -1);
+        mPrice = (BigDecimal) getIntent().getSerializableExtra("price");
         super.onCreate(savedInstanceState);
-
+        setTitle(mCode + "_" + mIndex);
     }
 
     @Override
     protected BaseFragment getFragment() {
-        return HistoryFragment.getInstance(mCode, mIndex);
+        return HistoryFragment.getInstance(mCode, String.valueOf(mIndex), mPrice);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.zptioning.lovemoney;
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -12,17 +11,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.zptioning.module_funds.Datautils;
 import com.zptioning.module_funds.StockConstants;
-import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface.ENUM_TITLES;
 import com.zptioning.module_widgets.adapter.BaseAdapter;
 import com.zptioning.module_widgets.custom_view.CustomItemDecoration;
 
 import java.util.EnumSet;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,12 +51,15 @@ public abstract class BaseFragment extends Fragment {
     // 代码输入框
     protected EditText mEtCode;
 
+    // 第一次进入 resume 时不需要拉接口
+    protected boolean mBFirst = true;
+
     /**
      * 0:mainfragment  1:detailfragment
      */
     protected int mType = StockConstants.TYPE_MAIN;
 
-    private RecyclerView mRvStocks;
+    protected RecyclerView mRvStocks;
     protected String strExchange = "";
 
     protected BaseAdapter mBaseAdapter;
@@ -81,9 +80,6 @@ public abstract class BaseFragment extends Fragment {
     };
     protected ContentResolver mContentResolver;
 
-    /* 数据处理工具 */
-//    private Datautils mDatautils;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -103,7 +99,6 @@ public abstract class BaseFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         // 查询当前有哪些表
         mContentResolver = _mActivity.getContentResolver();
-        Datautils._QueryAllTables(mContentResolver);
         initTopWidgets();
         initRvStocks();
         initEnums();
@@ -118,7 +113,7 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 初始化列表
      */
-    private void initRvStocks() {
+    protected void initRvStocks() {
         mRvStocks = mRootView.findViewById(R.id.rv_stocks);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(_mActivity);
         linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
@@ -143,11 +138,15 @@ public abstract class BaseFragment extends Fragment {
                     continue;
                 }
 
-                viewById.setText(String.format("%02d", ordinal) + ":" + value);
+                setColumnTitle(value, ordinal, viewById);
 
                 updateLines(viewById, enum_title);
             }
         }
+    }
+
+    protected void setColumnTitle(String value, int ordinal, TextView viewById) {
+        viewById.setText(String.format("%02d", ordinal) + ":" + value);
     }
 
     protected abstract void initAdapter();
@@ -155,7 +154,9 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 更新页面所有数据
      */
-    protected abstract void updateAllData();
+    protected  void updateAllData(){
+        Datautils._QueryAllTables(mContentResolver);
+    };
 
 
     /**
@@ -166,31 +167,7 @@ public abstract class BaseFragment extends Fragment {
      */
     protected abstract void updateLines(TextView viewById, ENUM_TITLES enum_title);
 
-    protected abstract void queryResult(ContentResolver contentResolver, Uri stockContentUri);
 
-    /**
-     * 插入指定股票信息
-     *
-     * @param stockEntity
-     * @param stockContentUri
-     */
-    protected void insertStock(StockEntity stockEntity, Uri stockContentUri) {
-        List<StockEntity> stockEntities = Datautils.queryAllStocks(mContentResolver, stockContentUri);
-        stockEntity.index = stockEntities.size() + 1;
-        Uri uri = Datautils.insert(mContentResolver, stockContentUri, stockEntity);
-        if (null == uri) {
-            Toast.makeText(_mActivity, "股票已存在！！", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        long id = ContentUris.parseId(uri);
-        if (-1 == id) {
-            Toast.makeText(_mActivity, "插入失败", Toast.LENGTH_SHORT).show();
-        } else {
-            // 查询当前数据库 有 哪些表
-            queryResult(mContentResolver, stockContentUri);
-            updateAllData();
-        }
-    }
 
     /**
      * 取消编辑框 选中状态

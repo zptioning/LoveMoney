@@ -1,6 +1,7 @@
 package com.zptioning.module_widgets.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,14 +9,13 @@ import android.view.ViewGroup;
 
 import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
-import com.zptioning.module_funds.StockInterface;
 import com.zptioning.module_funds.StockInterface.ENUM_TITLES;
 import com.zptioning.module_widgets.R;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
+import com.zptioning.module_widgets.viewholder.BaseViewHolder;
 import com.zptioning.module_widgets.viewholder.DetailViewHolder;
 import com.zptioning.module_widgets.viewholder.HistoryViewHolder;
 import com.zptioning.module_widgets.viewholder.MainViewHolder;
-import com.zptioning.module_widgets.viewholder.BaseViewHolder;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -33,6 +33,8 @@ import androidx.recyclerview.widget.RecyclerView;
  * @Description
  */
 public abstract class BaseAdapter extends RecyclerView.Adapter<BaseViewHolder> {
+
+    private final String TAG = this.getClass().getSimpleName() + "_tag";
 
     protected int mType;
     private List<StockEntity> mDataList;
@@ -65,6 +67,7 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         } else if (StockConstants.TYPE_DETAIL == mType) {
             return new DetailViewHolder(view, mOnBuyListener, mOnSellListener);
         } else {
+            view = LayoutInflater.from(mContext).inflate(R.layout.item_view_stock_horizontal, parent, false);
             return new HistoryViewHolder(view);
         }
     }
@@ -82,11 +85,11 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             holder.mTextViews[ordinal].setVisibility(View.VISIBLE);
             holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 
-            updateView(holder, stockEntity, enum_title, ordinal);
+            updateView(holder, stockEntity, enum_title, ordinal,position);
         }
     }
 
-    protected abstract void updateView(@NonNull BaseViewHolder holder, StockEntity stockEntity, StockInterface.ENUM_TITLES enum_title, int ordinal);
+    protected abstract void updateView(@NonNull BaseViewHolder holder, StockEntity stockEntity, ENUM_TITLES enum_title, int ordinal, int position);
 
     @Override
     public int getItemCount() {
@@ -99,6 +102,13 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseViewHolder> {
      * @param stockEntities
      */
     public void replaceData(List<StockEntity> stockEntities) {
+        if (null == stockEntities) {
+            return;
+        }
+        for (StockEntity entity :
+                stockEntities) {
+            Log.w(TAG, entity.toString());
+        }
         if (null == mDataList) {
             mDataList = new ArrayList<>();
         }

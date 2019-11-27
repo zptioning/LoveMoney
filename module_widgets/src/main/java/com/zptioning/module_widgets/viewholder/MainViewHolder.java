@@ -8,6 +8,8 @@ import android.widget.TextView;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
 
+import java.util.PriorityQueue;
+
 import androidx.annotation.NonNull;
 
 public class MainViewHolder extends BaseViewHolder {
@@ -26,6 +28,7 @@ public class MainViewHolder extends BaseViewHolder {
             public void onClick(View v) {
                 Intent intent = new Intent("com.zption.DetailActivity");
                 intent.putExtra("code", stockEntity.code);
+                intent.putExtra("price", stockEntity.price);
                 context.startActivity(intent);
             }
         });

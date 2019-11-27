@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_widgets.R;
 
@@ -60,7 +60,7 @@ public class OperationPopWindow extends PopupWindow {
             public void onClick(View v) {
                 if (null != mOnBuyListener) {
                     mStockEntity.time = System.currentTimeMillis();
-                    mStockEntity.status = 1;
+                    mStockEntity.status = StockConstants.hold;
                     if (0 == mStockEntity.count) {// 新买入的
                         mStockEntity.cost = new BigDecimal(mEtPrice.getText().toString());
                         try {
@@ -86,7 +86,7 @@ public class OperationPopWindow extends PopupWindow {
                     // 卖出 记录卖出的价格
                     mStockEntity.time = System.currentTimeMillis();
                     mStockEntity.cost = new BigDecimal(mEtPrice.getText().toString());
-                    mStockEntity.status = 2;
+                    mStockEntity.status = StockConstants.sold;
                     mOnSellListener.onSell(mStockEntity);
                     dismiss();
                 }
@@ -110,9 +110,7 @@ public class OperationPopWindow extends PopupWindow {
         } else {
             mView.findViewById(R.id.btn_sell).setVisibility(View.GONE);
             mEtCount.setText(mStockEntity.count + "");
-            mEtCount.setEnabled(false);
             mEtPrice.setText(mStockEntity.price.toString());
-            mEtPrice.setEnabled(false);
         }
         return this;
     }
@@ -125,9 +123,7 @@ public class OperationPopWindow extends PopupWindow {
     public OperationPopWindow setOnlySell() {
         mView.findViewById(R.id.btn_buy).setVisibility(View.GONE);
         mEtCount.setText(mStockEntity.count + "");
-        mEtCount.setEnabled(false);
         mEtPrice.setText(mStockEntity.cost.toString());
-        mEtPrice.setEnabled(false);
         return this;
     }
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
+import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
 
@@ -44,7 +45,7 @@ public class DetailViewHolder extends BaseViewHolder {
                                 }
                             }
                         });
-                if (stockEntity.status == 1) {
+                if (stockEntity.status == StockConstants.hold) {
                     operationPopWindow.setOnlySell();
                 } else {
                     operationPopWindow.setOnlyBuy(false);
@@ -61,7 +62,8 @@ public class DetailViewHolder extends BaseViewHolder {
             public void onClick(View v) {
                 Intent intent = new Intent("com.zption.HistoryActivity");
                 intent.putExtra("code", stockEntity.code);
-                intent.putExtra("code", stockEntity.index);
+                intent.putExtra("index", stockEntity.index);
+                intent.putExtra("price", stockEntity.price);
                 context.startActivity(intent);
             }
         });

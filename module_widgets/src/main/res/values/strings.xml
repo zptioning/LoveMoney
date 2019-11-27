@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">module_widgets</string>
+    <string name="hold" >#AEEEEE</string>
+    <string name="sold" >#EE82EE</string>
+    <string name="should_sell" >#AEEEEE</string>
+    <string name="should_buy" >#EE82EE</string>
 </resources>

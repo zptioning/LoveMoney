@@ -41,7 +41,6 @@
         </RadioGroup>
 
 
-
         <EditText
             android:id="@+id/et_code"
             android:layout_width="0dp"
@@ -63,31 +62,31 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
             android:layout_height="match_parent" >
 
-            <include layout="@layout/item_view_stock" />
+            <include layout="@layout/item_view_stock_horizontal" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:layout_marginLeft="1px"
                 android:layout_marginTop="1px"
+                android:layout_marginLeft="1dp"
                 android:id="@+id/rv_stocks"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>
 
-    </ScrollView>
+    </HorizontalScrollView>
 
     <TextView
         android:id="@+id/tv_des"
         android:layout_width="match_parent"
-        android:text="    数量：操作的所有股数\n    卖出：数量中卖出的部分\n    持有：数量中被持有的部分"
+        android:text="    数量：当前组代表多少股\n    状态：1:持有  2:已卖"
         android:layout_height="match_parent" />
 
 </LinearLayout>

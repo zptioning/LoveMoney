@@ -4,6 +4,7 @@ import android.util.TypedValue;
 import android.view.View;
 
 import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
@@ -24,7 +25,7 @@ public class DetailAdapter extends BaseAdapter {
     }
 
     @Override
-    protected void updateView(@NonNull BaseViewHolder holder, StockEntity stockEntity, StockInterface.ENUM_TITLES enum_title, int ordinal) {
+    protected void updateView(@NonNull BaseViewHolder holder, StockEntity stockEntity, StockInterface.ENUM_TITLES enum_title, int ordinal, int position) {
 
         switch (enum_title.name()) {
             // 执行买卖操作
@@ -33,7 +34,7 @@ public class DetailAdapter extends BaseAdapter {
                 holder.setonClickIndexListener(mContext, holder.mTextViews[ordinal], stockEntity);
                 break;
             case "TIME":
-                holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                 holder.setText(holder.mTextViews[ordinal], Datautils.dateFormat(stockEntity.time));
                 break;
             case "CODE":
@@ -59,10 +60,10 @@ public class DetailAdapter extends BaseAdapter {
             case "OPTION":
                 holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.operation));
                 holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                if (1 == stockEntity.status) {
-                    holder.mTextViews[ordinal].setText("卖吗？");
+                if (StockConstants.hold == stockEntity.status) {
+                    holder.mTextViews[ordinal].setText("想卖吗");
                 } else {
-                    holder.mTextViews[ordinal].setText("买吗？");
+                    holder.mTextViews[ordinal].setText("想买吗");
                 }
                 holder.setOnClickOptionListener(mContext, holder.mTextViews[ordinal], stockEntity, mType);
                 break;
@@ -75,8 +76,11 @@ public class DetailAdapter extends BaseAdapter {
                 holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.hold));
                 break;
             case "STATUS":
-                holder.setText(holder.mTextViews[ordinal], String.valueOf(stockEntity.status));
-                break;
+                if (StockConstants.hold == stockEntity.status) {
+                    holder.mTextViews[ordinal].setText("持有");
+                } else {
+                    holder.mTextViews[ordinal].setText("卖出");
+                }                break;
             default:
                 break;
         }
