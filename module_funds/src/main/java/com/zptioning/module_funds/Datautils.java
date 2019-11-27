@@ -335,6 +335,13 @@ public class Datautils {
         return format;
     }
 
+    public static String dateFormat(String strFormat, long date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(strFormat);
+        Date date1 = new Date(date);
+        String format = simpleDateFormat.format(date1);
+        return format;
+    }
+
     public static BigDecimal getRate(BigDecimal cost, BigDecimal price) {
         return price.subtract(cost).divide(cost, ROUNDING_MODE, BigDecimal.ROUND_HALF_UP);
     }

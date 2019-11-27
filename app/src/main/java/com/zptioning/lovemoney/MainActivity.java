@@ -1,5 +1,12 @@
 package com.zptioning.lovemoney;
 
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+
+import com.zptioning.lovemoney.broadcast.BootReceiver;
+import com.zptioning.module_widgets.notification.NotificationUtils;
+
 /**
  * @ClassName MainActivity
  * @Author zptioning
@@ -8,6 +15,8 @@ package com.zptioning.lovemoney;
  * @Description
  */
 public class MainActivity extends BaseActivity {
+
+    private BootReceiver mBootReceiver;
 
     @Override
     protected BaseFragment getFragment() {
@@ -18,4 +27,26 @@ public class MainActivity extends BaseActivity {
     protected int getLayoutId() {
         return R.layout.activity_main;
     }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        new NotificationUtils().sendNotification(this,
+                "老夫在后台运行", "不准Kill"
+                , NotificationUtils.NOTIFICATION_ID_STOCK);
+
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);//每分钟变化
+
+        mBootReceiver = new BootReceiver();
+        registerReceiver(mBootReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mBootReceiver);
+    }
 }
+
