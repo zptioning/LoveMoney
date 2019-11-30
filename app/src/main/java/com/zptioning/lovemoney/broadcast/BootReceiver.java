@@ -3,12 +3,9 @@ package com.zptioning.lovemoney.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.zptioning.lovemoney.MainActivity;
-import com.zptioning.module_funds.Datautils;
 import com.zptioning.module_widgets.notification.NotificationUtils;
 
 /**

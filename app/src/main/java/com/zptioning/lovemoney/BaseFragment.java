@@ -2,7 +2,6 @@ package com.zptioning.lovemoney;
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -12,7 +11,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.DataUtils;
 import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockInterface.ENUM_TITLES;
 import com.zptioning.module_widgets.adapter.BaseAdapter;
@@ -155,7 +154,7 @@ public abstract class BaseFragment extends Fragment {
      * 更新页面所有数据
      */
     protected  void updateAllData(){
-        Datautils._QueryAllTables(mContentResolver);
+        DataUtils._QueryAllTables(mContentResolver);
     };
 
 

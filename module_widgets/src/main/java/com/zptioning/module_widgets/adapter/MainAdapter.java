@@ -3,7 +3,7 @@ package com.zptioning.module_widgets.adapter;
 import android.util.TypedValue;
 import android.view.View;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.DataUtils;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
 import com.zptioning.module_widgets.popupwindow.OperationPopWindow;
@@ -32,7 +32,7 @@ public class MainAdapter extends BaseAdapter {
                 break;
             case "TIME":
                 holder.mTextViews[ordinal].setVisibility(View.GONE);
-                holder.setText(holder.mTextViews[ordinal], Datautils.dateFormat(stockEntity.time));
+                holder.setText(holder.mTextViews[ordinal], DataUtils.dateFormat(stockEntity.time));
                 break;
             case "CODE":
                 holder.setText(holder.mTextViews[ordinal], stockEntity.code);

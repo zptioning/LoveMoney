@@ -61,8 +61,8 @@ public class OperationPopWindow extends PopupWindow {
                 if (null != mOnBuyListener) {
                     mStockEntity.time = System.currentTimeMillis();
                     mStockEntity.status = StockConstants.hold;
+                    mStockEntity.cost = new BigDecimal(mEtPrice.getText().toString());
                     if (0 == mStockEntity.count) {// 新买入的
-                        mStockEntity.cost = new BigDecimal(mEtPrice.getText().toString());
                         try {
                             mStockEntity.count = Integer.parseInt(mEtCount.getText().toString());
                         } catch (NumberFormatException e) {

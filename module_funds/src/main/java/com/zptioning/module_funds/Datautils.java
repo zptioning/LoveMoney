@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @ClassName Datautils
+ * @ClassName DataUtils
  * @Author zptioning
  * @Date 2019-11-04 14:28
  * @Version 1.0
@@ -35,9 +35,9 @@ import java.util.List;
  * .append(" hold ").append(" int ")// 持有
  * .append(" sold ").append(" int ");// 卖出
  */
-public class Datautils {
+public class DataUtils {
 
-    private static final String TAG = Datautils.class.getSimpleName() + "_tag";
+    private static final String TAG = DataUtils.class.getSimpleName() + "_tag";
 
     public static final int ROUNDING_MODE = 3;
 
@@ -155,6 +155,16 @@ public class Datautils {
     public static void delete(ContentResolver contentResolver, Uri uri, String code) {
         int delete = contentResolver.delete(uri,
                 "code = ?", new String[]{code});
+    }
+
+    /**
+     * 删：删除数据
+     *
+     * @param contentResolver
+     */
+    public static void delete(ContentResolver contentResolver, Uri uri, long index) {
+        int delete = contentResolver.delete(uri,
+                "time > ?", new String[]{index + ""});
     }
 
     /**
@@ -297,6 +307,13 @@ public class Datautils {
         return null;
     }
 
+    public static void _ClearTable(ContentResolver contentResolver, String sh600446_1) {
+        Uri uri = Uri.parse("content://" + FundsProvider.AUTHORITY);
+
+        contentResolver.call(uri, "_ClearTable", sh600446_1, null);
+
+    }
+
     /**
      * 给uri 添加 fragment
      *
@@ -345,5 +362,4 @@ public class Datautils {
     public static BigDecimal getRate(BigDecimal cost, BigDecimal price) {
         return price.subtract(cost).divide(cost, ROUNDING_MODE, BigDecimal.ROUND_HALF_UP);
     }
-
 }

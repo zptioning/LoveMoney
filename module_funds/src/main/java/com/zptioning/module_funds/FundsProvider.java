@@ -197,7 +197,7 @@ public class FundsProvider extends ContentProvider {
         }
 
         if (TextUtils.equals(FundsDBOpenHelper.TABLE_NAME_OTHER, tableName)) {
-                tableName = uri.getFragment();// sh510300
+            tableName = uri.getFragment();// sh510300
         }
 
         long insert = mDb.insert(tableName, null, values);
@@ -367,6 +367,8 @@ public class FundsProvider extends ContentProvider {
                 if (null != extras) {
                     String table_name = extras.getString("table_name");
                     _ClearTable(table_name);
+                } else {
+                    _ClearTable(arg);
                 }
                 break;
         }

@@ -1,6 +1,5 @@
 package com.zptioning.lovemoney;
 
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.DataUtils;
 import com.zptioning.module_funds.FundsProvider;
 import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
@@ -26,7 +25,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.zptioning.module_funds.Datautils.ROUNDING_MODE;
+import static com.zptioning.module_funds.DataUtils.ROUNDING_MODE;
 import static java.math.BigDecimal.ROUND_HALF_UP;
 
 /**
@@ -97,7 +96,7 @@ public class MainFragment extends BaseFragment {
                     return false;
                 }
 
-                StockEntity stockEntity = Datautils.getRemoteData(strExchange + strCode);
+                StockEntity stockEntity = DataUtils.getRemoteData(strExchange + strCode);
                 insertStock(stockEntity, FundsProvider.STOCK_CONTENT_URI);
                 return true;
             }
@@ -115,11 +114,11 @@ public class MainFragment extends BaseFragment {
         if (null == stockEntity) {
             return;
         }
-        List<StockEntity> stockEntities = Datautils.queryAllStocks(mContentResolver, stockContentUri);
+        List<StockEntity> stockEntities = DataUtils.queryAllStocks(mContentResolver, stockContentUri);
         stockEntity.index = stockEntities.size() + 1;
 
-        Uri uri = Datautils.insert(mContentResolver,
-                Datautils.addStockFragment(stockEntity.code), stockEntity);
+        Uri uri = DataUtils.insert(mContentResolver,
+                DataUtils.addStockFragment(stockEntity.code), stockEntity);
 
         if (null == uri) {
             Toast.makeText(_mActivity, "股票已存在！！", Toast.LENGTH_SHORT).show();
@@ -147,7 +146,7 @@ public class MainFragment extends BaseFragment {
     @Override
     protected void updateAllData() {
         super.updateAllData();
-        List<StockEntity> stockEntities = Datautils.queryAllStocks(_mActivity.getContentResolver(),
+        List<StockEntity> stockEntities = DataUtils.queryAllStocks(_mActivity.getContentResolver(),
                 FundsProvider.STOCK_CONTENT_URI);
         updateAllDataWithRemoteData(stockEntities);
         calculateWithLocalData(stockEntities);
@@ -172,8 +171,8 @@ public class MainFragment extends BaseFragment {
     private void calculateWithLocalData(List<StockEntity> stockEntities) {
         for (int i = 0; i < stockEntities.size(); i++) {
             StockEntity stockEntity = stockEntities.get(i);
-            List<StockEntity> detailList = Datautils.queryAllStocks(mContentResolver,
-                    Datautils.addOtherFragment(stockEntity.code));
+            List<StockEntity> detailList = DataUtils.queryAllStocks(mContentResolver,
+                    DataUtils.addOtherFragment(stockEntity.code));
             if (null == detailList || detailList.size() == 0) {
                 continue;
             }
@@ -200,7 +199,7 @@ public class MainFragment extends BaseFragment {
                 continue;
             }
             stockEntity.cost = cost.divide(new BigDecimal(allHold), ROUNDING_MODE, ROUND_HALF_UP);
-            stockEntity.rate = Datautils.getRate(stockEntity.cost, stockEntity.price);
+            stockEntity.rate = DataUtils.getRate(stockEntity.cost, stockEntity.price);
         }
     }
 
@@ -216,7 +215,7 @@ public class MainFragment extends BaseFragment {
 
         for (int i = 0; i < stockEntities.size(); i++) {
             StockEntity stockEntity = stockEntities.get(i);
-            StockEntity remoteData = Datautils.getRemoteData(stockEntity.code);
+            StockEntity remoteData = DataUtils.getRemoteData(stockEntity.code);
             if (null == remoteData) {
                 continue;
             }

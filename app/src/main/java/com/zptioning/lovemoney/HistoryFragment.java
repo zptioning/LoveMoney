@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.DataUtils;
 import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
@@ -72,15 +72,15 @@ public class HistoryFragment extends BaseFragment {
     @Override
     protected void updateAllData() {
         super.updateAllData();
-        List<StockEntity> stockEntities = Datautils.queryAllStocks(mContentResolver,
-                Datautils.addOtherFragment(sCode + "_" + sIndex));
+        List<StockEntity> stockEntities = DataUtils.queryAllStocks(mContentResolver,
+                DataUtils.addOtherFragment(sCode + "_" + sIndex));
 
-//        StockEntity remoteData = Datautils.getRemoteData(sCode);
+//        StockEntity remoteData = DataUtils.getRemoteData(sCode);
 //        if (null != remoteData) {
 //            for (int i = 0; i < stockEntities.size(); i++) {
 //                StockEntity stockEntity = stockEntities.get(i);
 //                stockEntity.price = remoteData.price;
-//                stockEntity.rate = Datautils.getRate(stockEntity.cost, stockEntity.price);
+//                stockEntity.rate = DataUtils.getRate(stockEntity.cost, stockEntity.price);
 //            }
 //        }
         mBaseAdapter.replaceData(stockEntities);

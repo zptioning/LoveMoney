@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.DataUtils;
 import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
@@ -37,7 +37,7 @@ public class DetailFragment extends BaseFragment {
     // 当前页面 股票代码 也是对应股票 数据库中表的名字
     private static String sCode;
     private static BigDecimal sPrice;
-    private Uri mUri = Datautils.addOtherFragment(sCode);
+    private Uri mUri = DataUtils.addOtherFragment(sCode);
     private StockObserver mStockObserver;
 
     public static DetailFragment getInstance(String code, BigDecimal price) {
@@ -81,10 +81,10 @@ public class DetailFragment extends BaseFragment {
                             @Override
                             public void onBuy(StockEntity stockEntity) {
                                 // 新买入操作
-                                Datautils.insert(mContentResolver,
-                                        Datautils.addOtherFragment(stockEntity.code), stockEntity);
-                                Datautils.insert(mContentResolver,
-                                        Datautils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
+                                DataUtils.insert(mContentResolver,
+                                        DataUtils.addOtherFragment(stockEntity.code), stockEntity);
+                                DataUtils.insert(mContentResolver,
+                                        DataUtils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
                             }
                         })
                         .setOnlyBuy(true).show(_mActivity);
@@ -94,6 +94,18 @@ public class DetailFragment extends BaseFragment {
 
         mStockObserver = new StockObserver(new Handler());
         mContentResolver.registerContentObserver(mUri, true, mStockObserver);
+
+//        DataUtils.delete(mContentResolver,DataUtils.addOtherFragment("sh600446_1"),1575099590984l);
+//        StockEntity stockEntity = new StockEntity();
+//        stockEntity.index = 1;
+//        stockEntity.code = sCode;
+//        stockEntity.price = sPrice;
+//        stockEntity.cost = new BigDecimal("28.05");
+//        stockEntity.rate = new BigDecimal("0");
+//        stockEntity.count = 100;
+//        stockEntity.status = 1;
+//        DataUtils.update(mContentResolver, DataUtils.addOtherFragment("sh600446_1"), stockEntity);
+
     }
 
     @Override
@@ -103,18 +115,18 @@ public class DetailFragment extends BaseFragment {
                     @Override
                     public void onBuy(StockEntity stockEntity) {
                         // 买入操作
-                        Datautils.update(mContentResolver, mUri, stockEntity);
-                        Datautils.insert(mContentResolver,
-                                Datautils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
+                        DataUtils.update(mContentResolver, mUri, stockEntity);
+                        DataUtils.insert(mContentResolver,
+                                DataUtils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
                     }
                 },
                 new OperationPopWindow.OnSellListener() {
                     @Override
                     public void onSell(StockEntity stockEntity) {
                         // 卖出操作
-                        Datautils.update(mContentResolver, mUri, stockEntity);
-                        Datautils.insert(mContentResolver,
-                                Datautils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
+                        DataUtils.update(mContentResolver, mUri, stockEntity);
+                        DataUtils.insert(mContentResolver,
+                                DataUtils.addOtherFragment(stockEntity.code + "_" + stockEntity.index), stockEntity);
                     }
                 });
     }
@@ -125,20 +137,19 @@ public class DetailFragment extends BaseFragment {
     @Override
     protected void updateAllData() {
         super.updateAllData();
-        List<StockEntity> stockEntities = Datautils.queryAllStocks(mContentResolver, mUri);
+        List<StockEntity> stockEntities = DataUtils.queryAllStocks(mContentResolver, mUri);
         if (null == stockEntities || stockEntities.size() == 0) {
             return;
         }
         Log.e("updateAllData_tag", stockEntities.toString());
-        StockEntity remoteData = Datautils.getRemoteData(sCode);
+        StockEntity remoteData = DataUtils.getRemoteData(sCode);
         if (null != remoteData) {
             for (int i = 0; i < stockEntities.size(); i++) {
                 StockEntity stockEntity = stockEntities.get(i);
                 stockEntity.price = remoteData.price;
-                stockEntity.rate = Datautils.getRate(stockEntity.cost, stockEntity.price);
+                stockEntity.rate = DataUtils.getRate(stockEntity.cost, stockEntity.price);
             }
         }
-
 
         mBaseAdapter.replaceData(stockEntities);
     }

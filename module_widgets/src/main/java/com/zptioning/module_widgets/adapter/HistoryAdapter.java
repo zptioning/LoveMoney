@@ -4,7 +4,7 @@ import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.DataUtils;
 import com.zptioning.module_funds.StockConstants;
 import com.zptioning.module_funds.StockEntity;
 import com.zptioning.module_funds.StockInterface;
@@ -42,7 +42,7 @@ public class HistoryAdapter extends BaseAdapter {
                 break;
             case "TIME":
                 holder.mTextViews[ordinal].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                holder.setText(holder.mTextViews[ordinal], Datautils.dateFormat(stockEntity.time));
+                holder.setText(holder.mTextViews[ordinal], DataUtils.dateFormat(stockEntity.time));
                 break;
             case "CODE":
                 holder.mTextViews[ordinal].setVisibility(View.GONE);

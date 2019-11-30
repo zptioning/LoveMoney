@@ -10,7 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.zptioning.module_funds.Datautils;
+import com.zptioning.module_funds.DataUtils;
 
 /**
  * 通知管理工具类
@@ -25,7 +25,6 @@ public class NotificationUtils {
     public static final String KEY_DD = "dd";
     public static final String KEY_TIME = "time";
     public static final String KEY_TIME1 = "time1";
-    //    public static final String KEY_COUNT = "count";
     public static final String VALUE_ZZJN = "ZZJN";
     public static final String VALUE_HLS = "HLS";
 
@@ -121,6 +120,11 @@ public class NotificationUtils {
         sendNotification(context, dateFormat, strContext, notificationIdStock);
     }
 
+    /**
+     * @param context
+     * @param dateFormat
+     * @param notificationIdStock
+     */
     public void sendMedicine(Context context, String dateFormat, int notificationIdStock) {
         SharedPreferences sp = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
         String dd = sp.getString(KEY_DD, null);
@@ -142,7 +146,7 @@ public class NotificationUtils {
         // 第一步
         SharedPreferences sp = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
         long lastDay = sp.getLong(KEY_TIME1, today - 4);
-        String dateFormat = Datautils.dateFormat("MM-dd HH", timeMillis);
+        String dateFormat = DataUtils.dateFormat("MM-dd HH", timeMillis);
         if ((today - lastDay) % 4 == 0) {
             sendNotification(context, dateFormat, "RGXMZ", NOTIFICATION_ID_RRXMZ);
         }
@@ -156,17 +160,18 @@ public class NotificationUtils {
             } else {
                 sendNotification(context, dateFormat, "ZZJN", NOTIFICATION_ID_STOCK);
             }
-        }else{
+        } else {
             sendNotification(context, dateFormat, dd, NOTIFICATION_ID_STOCK);
         }
     }
 
     public void handleMedicine(Context context) {
         long timeMillis = System.currentTimeMillis();
-        String dateFormat = Datautils.dateFormat("MM-dd HH", timeMillis);
-        String hour = Datautils.dateFormat("HH", timeMillis);
+        String dateFormat = DataUtils.dateFormat("MM-dd HH", timeMillis);
+        String hour = DataUtils.dateFormat("HH", timeMillis);
+        String minite = DataUtils.dateFormat("mm", timeMillis);
         long today = timeMillis / 1000 / 60 / 60 / 24;
-        if (hour.equals("20")) {
+        if (minite.equals("00")) {
             // 第一步
             SharedPreferences sp = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
             long lastDay = sp.getLong(KEY_TIME1, today - 4);
